@@ -3,23 +3,20 @@ import os
 import discord
 import mlbstatsapi
 from dotenv import load_dotenv
+from discord.ext import commands
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-intents = discord.Intents.default()
+intents = discord.Intents.default() # Set parameters for discord bot
 intents.message_content = True
 
-client = discord.Client(intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents) # Setup bot to read commands
 
-mlb = mlbstatsapi.Mlb()
+mlb = mlbstatsapi.Mlb() # Initalize MLB API
 
-@client.event
-async def on_ready():
-    print('Discord bot has connected!')
+@bot.command() # Bot command to add player
+async def add(ctx, *msg):
+    print(msg)
 
-@client.event
-async def on_message(message):
-    print(f'From {message.author}: {message.content}')
-
-client.run(TOKEN)
+bot.run(TOKEN)

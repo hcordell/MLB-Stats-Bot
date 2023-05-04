@@ -21,8 +21,11 @@ players = [] # List of players
 async def add(ctx, *msg):
     player = ' '.join(msg)
     if player not in players:
-        players.append(player)
-        await ctx.send('Success: player found')
+        if mlb.get_people_id(player):
+            players.append(player)
+            await ctx.send('Success: player found')
+        else:
+            await ctx.send('Error: player not found')
     else:
         await ctx.send('Error: player already in list')
 

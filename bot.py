@@ -15,8 +15,12 @@ bot = commands.Bot(command_prefix='!', intents=intents) # Setup bot to read comm
 
 mlb = mlbstatsapi.Mlb() # Initalize MLB API
 
+players = [] # List of players
+
 @bot.command() # Bot command to add player
 async def add(ctx, *msg):
-    print(msg)
+    player = ' '.join(msg)
+    if player not in players:
+        players.append(player)
 
 bot.run(TOKEN)

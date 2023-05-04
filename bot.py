@@ -22,5 +22,20 @@ async def add(ctx, *msg):
     player = ' '.join(msg)
     if player not in players:
         players.append(player)
+        await ctx.send('Success: player found')
+    else:
+        await ctx.send('Error: player already in list')
+
+@bot.command() # Bot command to remove player
+async def remove(ctx, *msg):
+    player = ' '.join(msg)
+    if player in players:
+        players.remove(player)
+    else:
+        await ctx.send('Error: Player not found.')
+
+@bot.command() # Bot command to print player list
+async def list(ctx, *args):
+    await ctx.send(', '.join(players))
 
 bot.run(TOKEN)

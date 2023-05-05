@@ -49,8 +49,9 @@ async def remove(ctx, *msg):
         if player in players:
             players.remove(player)
             player_attributes.pop(player)
+            await ctx.send('Success: player removed')
         else:
-            await ctx.send('Error: Player not found.')
+            await ctx.send('Error: Player not found')
 
 @bot.command() # Bot command to print player list
 async def list(ctx, *args):

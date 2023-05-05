@@ -21,7 +21,7 @@ player_attributes = {} # Dictionary of details about players
 
 @bot.command() # Bot command to add player
 async def add(ctx, *msg):
-    if ctx.channel.id == 1103511198474960916:
+    if ctx.channel.id == 1103511198474960916: # Channel to send commands in
         player = ' '.join(msg)
         if player not in players:
             if mlb.get_people_id(player): # Check if name matches player in database
@@ -43,7 +43,7 @@ async def add(ctx, *msg):
 
 @bot.command() # Bot command to remove player
 async def remove(ctx, *msg):
-    if ctx.channel.id == 1103511198474960916:
+    if ctx.channel.id == 1103511198474960916: # Channel to send commands in
         player = ' '.join(msg)
         if player in players:
             players.remove(player)
@@ -54,12 +54,12 @@ async def remove(ctx, *msg):
 
 @bot.command() # Bot command to print player list
 async def list(ctx, *args):
-    if ctx.channel.id == 1103511198474960916:
+    if ctx.channel.id == 1103511198474960916: # Channel to send commands in
         await ctx.send(', '.join(players))
 
 @tasks.loop(minutes=1)
 async def update():
-    channel = bot.get_channel(1103827849007333447)
+    channel = bot.get_channel(1103827849007333447) # Channel to send updates in
     for player in players:
         player_id = player_attributes[f'{player}']['Player ID']
         position = player_attributes[f'{player}']['Position']

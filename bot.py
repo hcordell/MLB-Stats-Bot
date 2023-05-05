@@ -2,7 +2,6 @@
 import os
 import discord
 import mlbstatsapi
-import statsapi
 from datetime import date
 from dotenv import load_dotenv
 from discord.ext import commands, tasks

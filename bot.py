@@ -29,8 +29,13 @@ async def add(ctx, *msg):
                 players.append(player)
                 player_attributes[f'{player}'] = {
                     'Position': '',
+                    'Player ID': mlb.get_people_id(player)[0],
                     'Old Summary': ''
                 }
+                if mlb.get_person(player_attributes[f'{player}']['Player ID']).primaryposition.name == 'Pitcher':
+                    player_attributes[f'{player}']['Position'] = 'pitching'
+                else:
+                    player_attributes[f'{player}']['Position'] = 'batting'
                 await ctx.send('Success: player found')
             else:
                 await ctx.send('Error: player not found')
@@ -52,23 +57,24 @@ async def list(ctx, *args):
     if ctx.channel.id == 1103511198474960916:
         await ctx.send(', '.join(players))
 
-@tasks.loop(minutes=2)
+@tasks.loop(minutes=1)
 async def update():
     channel = bot.get_channel(1103827849007333447)
     for player in players:
-        player_id = mlb.get_people_id(player)[0]
+        player_id = player_attributes[f'{player}']['Player ID']
+        position = player_attributes[f'{player}']['Position']
         for game in mlb.get_scheduled_games_by_date(date.today()):
             try:
-                summary = (f'{player}: {mlb.get_game_box_score(game.gamepk).teams.home.players[f"id{player_id}"].stats["batting"]["summary"]}')
-                if oldSummary != summary:
+                summary = (f'{player}: {mlb.get_game_box_score(game.gamepk).teams.home.players[f"id{player_id}"].stats[position]["summary"]}')
+                if player_attributes[f'{player}']['Old Summary'] != summary:
                     await channel.send(summary)
-                    oldSummary = summary
+                    player_attributes[f'{player}']['Old Summary'] = summary
             except:
                 try:
-                    summary = (f'{player}: {mlb.get_game_box_score(game.gamepk).teams.away.players[f"id{player_id}"].stats["batting"]["summary"]}')
-                    if oldSummary != summary:
+                    summary = (f'{player}: {mlb.get_game_box_score(game.gamepk).teams.away.players[f"id{player_id}"].stats[position]["summary"]}')
+                    if player_attributes[f'{player}']['Old Summary'] != summary:
                         await channel.send(summary)
-                        oldSummary = summary
+                        player_attributes[f'{player}']['Old Summary'] = summary
                 except:
                     continue
                 else:

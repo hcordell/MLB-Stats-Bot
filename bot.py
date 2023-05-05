@@ -20,11 +20,20 @@ players = [] # List of players
 player_attributes = {} # Dictionary of details about players
 
 @bot.command() # Bot command to add player
-async def add(ctx, *msg):
+#@commands.has_any_role('Admins', 'Moderator')
+async def add(ctx, *msgs):
     if ctx.channel.id == 1103511198474960916: # Channel to send commands in
-        player = ' '.join(msg)
+        player = ' '.join(msgs)
+        player = player.split()
+        
+        i = 0
+        for name in player:
+            player[i] = name.capitalize()
+            i += 1
+        player = ' '.join(player)
+
         if player not in players:
-            if mlb.get_people_id(player): # Check if name matches player in database
+            if mlb.get_people_id(player)[0]: # Check if name matches player in database
                 players.append(player)
                 player_attributes[f'{player}'] = {
                     'Position': '',
@@ -42,6 +51,7 @@ async def add(ctx, *msg):
             await ctx.send('Error: player already in list')
 
 @bot.command() # Bot command to remove player
+#@commands.has_any_role('Admins', 'Moderator')
 async def remove(ctx, *msg):
     if ctx.channel.id == 1103511198474960916: # Channel to send commands in
         player = ' '.join(msg)
@@ -53,9 +63,13 @@ async def remove(ctx, *msg):
             await ctx.send('Error: Player not found')
 
 @bot.command() # Bot command to print player list
+#@commands.has_any_role('Admins', 'Moderator')
 async def list(ctx, *args):
     if ctx.channel.id == 1103511198474960916: # Channel to send commands in
-        await ctx.send(', '.join(players))
+        if len(players) == 0:
+            await ctx.send('List is empty')
+        else:
+            await ctx.send(', '.join(players))
 
 @tasks.loop(minutes=1)
 async def update():

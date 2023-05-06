@@ -37,7 +37,7 @@ def get_player(mlb, player_name):
     return player
 
 @unblock
-def get_position(mlb, player, player_attributes)
+def get_position(mlb, player, player_attributes):
     player_position = mlb.get_person(player_attributes[f'{player}']['Player ID']).primaryposition.name
     return player_position
 

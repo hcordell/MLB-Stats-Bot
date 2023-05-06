@@ -35,10 +35,10 @@ def get_schedule():
 
 @unblock
 def get_stats(gameID, playerID, position):
-    summary = mlb.get_game_box_score(game.gamepk).teams.home.players[f"id{player_id}"].stats[position]["summary"]
+    summary = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]["summary"]
     if summary:
         return summary
-    summary = mlb.get_game_box_score(game.gamepk).teams.away.players[f"id{player_id}"].stats[position]["summary"]
+    summary = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]["summary"]
     if summary:
         return summary
     return None
@@ -108,8 +108,6 @@ async def update(channel):
                     await channel.send(summary)
                     player_attributes[f'{player}']['Old Summary'] = summary
                 break
-            else:
-                continue
 
 @bot.event
 async def on_ready():

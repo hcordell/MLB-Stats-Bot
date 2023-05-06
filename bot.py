@@ -2,9 +2,9 @@
 import os
 import discord
 import mlbstatsapi
-import aiohttp
 import functools
 import asyncio
+import typing
 from datetime import date
 from dotenv import load_dotenv
 from discord.ext import commands, tasks
@@ -22,15 +22,26 @@ mlb = mlbstatsapi.Mlb() # Initalize MLB API
 players = [] # List of players
 player_attributes = {} # Dictionary of details about players
 
-def unblock(func):
+def unblock(func: typing.Callable) -> typing.Coroutine:
     @functools.wraps(func)
     async def wrapper(*args, **kwargs):
         return await asyncio.to_thread(func, *args, **kwargs)
     return wrapper
 
 @unblock
-def blocked_func(func):
-    return func
+def get_schedule():
+    schedule = mlb.get_scheduled_games_by_date(date.today())
+    return schedule
+
+@unblock
+def get_stats(gameID, playerID, position):
+    summary = mlb.get_game_box_score(game.gamepk).teams.home.players[f"id{player_id}"].stats[position]["summary"]
+    if summary:
+        return summary
+    summary = mlb.get_game_box_score(game.gamepk).teams.away.players[f"id{player_id}"].stats[position]["summary"]
+    if summary:
+        return summary
+    return None
 
 @bot.command() # Bot command to add player
 #@commands.has_any_role('Admins', 'Moderator')
@@ -85,30 +96,20 @@ async def list(ctx, *args):
 
 @tasks.loop(minutes=1)
 async def update(channel):
-    schedule = await blocked_func(mlb.get_scheduled_games_by_date(date.today()))
+    schedule = await get_schedule()
     for player in players:
         player_id = player_attributes[f'{player}']['Player ID']
         position = player_attributes[f'{player}']['Position']
         for game in schedule:
-            try:
-                player_stats = await blocked_func(mlb.get_game_box_score(game.gamepk).teams.home.players[f"id{player_id}"].stats[position]["summary"])
+            player_stats = await get_stats(game.gamepk, player_id, position)
+            if player_stats:
                 summary = (f'{player}: {player_stats}')
                 if player_attributes[f'{player}']['Old Summary'] != summary:
                     await channel.send(summary)
                     player_attributes[f'{player}']['Old Summary'] = summary
-            except:
-                try:
-                    player_stats = await blocked_func(mlb.get_game_box_score(game.gamepk).teams.away.players[f"id{player_id}"].stats[position]["summary"])
-                    summary = (f'{player}: {player_stats}')
-                    if player_attributes[f'{player}']['Old Summary'] != summary:
-                        await channel.send(summary)
-                        player_attributes[f'{player}']['Old Summary'] = summary
-                except:
-                    continue
-                else:
-                    break
-            else:
                 break
+            else:
+                continue
 
 @bot.event
 async def on_ready():

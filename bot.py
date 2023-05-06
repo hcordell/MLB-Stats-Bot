@@ -29,16 +29,32 @@ def unblock(func: typing.Callable) -> typing.Coroutine:
     return wrapper
 
 @unblock
-def get_schedule():
+def get_player(mlb, player_name):
+    try:
+        player = mlb.get_people_id(player_name)
+    except:
+        return None
+    return player
+
+@unblock
+def get_position(mlb, player, player_attributes)
+    player_position = mlb.get_person(player_attributes[f'{player}']['Player ID']).primaryposition.name
+    return player_position
+
+@unblock
+def get_schedule(mlb):
     schedule = mlb.get_scheduled_games_by_date(date.today())
     return schedule
 
 @unblock
-def get_stats(gameID, playerID, position):
-    summary = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]["summary"]
-    if summary:
-        return summary
-    summary = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]["summary"]
+def get_stats(mlb, gameID, playerID, position):
+    try:
+        summary = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]["summary"]
+    except:
+        try:
+            summary = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]["summary"]
+        except:
+            return None
     if summary:
         return summary
     return None
@@ -56,14 +72,16 @@ async def add(ctx, *msgs):
         player = ' '.join(player)
 
         if player not in players:
-            if mlb.get_people_id(player): # Check if name matches player in database
+            player_name = await get_player(mlb, player)
+            if player_name: # Check if name matches player in database
                 players.append(player)
                 player_attributes[f'{player}'] = {
                     'Position': '',
-                    'Player ID': mlb.get_people_id(player)[0],
+                    'Player ID': player_name[0],
                     'Old Summary': ''
                 }
-                if mlb.get_person(player_attributes[f'{player}']['Player ID']).primaryposition.name == 'Pitcher':
+                player_position = await get_position(mlb, player, player_attributes)
+                if player_position == 'Pitcher':
                     player_attributes[f'{player}']['Position'] = 'pitching'
                 else:
                     player_attributes[f'{player}']['Position'] = 'batting'
@@ -96,12 +114,12 @@ async def list(ctx, *args):
 
 @tasks.loop(minutes=1)
 async def update(channel):
-    schedule = await get_schedule()
+    schedule = await get_schedule(mlb)
     for player in players:
         player_id = player_attributes[f'{player}']['Player ID']
         position = player_attributes[f'{player}']['Position']
         for game in schedule:
-            player_stats = await get_stats(game.gamepk, player_id, position)
+            player_stats = await get_stats(mlb, game.gamepk, player_id, position)
             if player_stats:
                 summary = (f'{player}: {player_stats}')
                 if player_attributes[f'{player}']['Old Summary'] != summary:

@@ -21,7 +21,6 @@ mlb = mlbstatsapi.Mlb() # Initalize MLB API
 
 players = [] # List of players
 player_attributes = {} # Dictionary of details about players
-current_date = date.today()
 
 def unblock(func: typing.Callable) -> typing.Coroutine:
     @functools.wraps(func)
@@ -114,7 +113,7 @@ async def list(ctx, *args):
             await ctx.send(', '.join(players))
 
 @tasks.loop(seconds=150)
-async def update(channel):
+async def update(channel, current_date):
     if current_date != date.today():
         schedule = await get_schedule(mlb)
         current_date = date.today()
@@ -133,6 +132,7 @@ async def update(channel):
 @bot.event
 async def on_ready():
     channel = bot.get_channel(1103827849007333447) # Channel to send updates in
-    update.start(channel)
+    current_date = date.today()
+    update.start(channel, current_date)
 
 bot.run(TOKEN)

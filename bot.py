@@ -117,7 +117,7 @@ async def list(ctx, *args):
 async def update(channel):
     if current_date != date.today():
         schedule = await get_schedule(mlb)
-        player_attributes[f'{player}']['Date'] = date.today()
+        current_date = date.today()
     for player in players:
         player_id = player_attributes[f'{player}']['Player ID']
         position = player_attributes[f'{player}']['Position']

@@ -78,7 +78,8 @@ async def add(ctx, *msgs):
                 player_attributes[f'{player}'] = {
                     'Position': '',
                     'Player ID': player_name[0],
-                    'Old Summary': ''
+                    'Old Summary': '',
+                    'Game ID': ''
                 }
                 player_position = await get_position(mlb, player, player_attributes)
                 if player_position == 'Pitcher':
@@ -114,6 +115,7 @@ async def list(ctx, *args):
 
 @tasks.loop(seconds=150)
 async def update(channel, current_date, schedule):
+    global schedule
     if current_date != date.today():
         schedule = await get_schedule(mlb)
         current_date = date.today()
@@ -128,6 +130,7 @@ async def update(channel, current_date, schedule):
                     await channel.send(summary)
                     player_attributes[f'{player}']['Old Summary'] = summary
                 break
+    return schedule
 
 @bot.event
 async def on_ready():

@@ -114,7 +114,7 @@ async def list(ctx, *args):
 
 @tasks.loop(seconds=150)
 async def update(channel, current_date):
-    if current_date != date.today():
+    if current_date != date.today() or not schedule:
         schedule = await get_schedule(mlb)
         current_date = date.today()
     for player in players:

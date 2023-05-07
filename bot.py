@@ -47,7 +47,7 @@ def get_schedule(mlb):
     return schedule
 
 @unblock
-def get_stats(mlb, gameID, playerID, position):
+def get_stats(mlb, gameID, player, playerID, position):
     try:
         summary = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]["summary"]
     except:
@@ -56,6 +56,7 @@ def get_stats(mlb, gameID, playerID, position):
         except:
             return None
     if summary:
+        player_attributes[f'{player}']['Game ID'] = gameID
         return summary
     return None
 
@@ -78,7 +79,8 @@ async def add(ctx, *msgs):
                 player_attributes[f'{player}'] = {
                     'Position': '',
                     'Player ID': player_name[0],
-                    'Old Summary': ''
+                    'Old Summary': '',
+                    'Game ID': ''
                 }
                 player_position = await get_position(mlb, player, player_attributes)
                 if player_position == 'Pitcher':
@@ -112,18 +114,26 @@ async def list(ctx, *args):
         else:
             await ctx.send(', '.join(players))
 
-@tasks.loop(seconds=150)
+@tasks.loop(seconds=15)
 async def update(channel):
     global current_date
     global schedule
+    date_changed = False
     if current_date != date.today():
         schedule = await get_schedule(mlb)
         current_date = date.today()
+        date_changed = True
     for player in players:
+        if date_changed:
+            player_attributes[f'{player}']['Game ID'] = ''
         player_id = player_attributes[f'{player}']['Player ID']
         position = player_attributes[f'{player}']['Position']
+        gameID = player_attributes[f'{player}']['Game ID']
         for game in schedule:
-            player_stats = await get_stats(mlb, game.gamepk, player_id, position)
+            if gameID:
+                player_stats = await get_stats(mlb, gameID, player, player_id, position)
+            else:
+                player_stats = await get_stats(mlb, game.gamepk, player, player_id, position)
             if player_stats:
                 summary = (f'{player}: {player_stats}')
                 if player_attributes[f'{player}']['Old Summary'] != summary:

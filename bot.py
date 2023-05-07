@@ -114,7 +114,8 @@ async def list(ctx, *args):
 
 @tasks.loop(seconds=150)
 async def update(channel):
-    global schedule, current_date
+    global current_date
+    global schedule
     if current_date != date.today():
         schedule = await get_schedule(mlb)
         current_date = date.today()
@@ -131,8 +132,9 @@ async def update(channel):
                 break
 
 @bot.event
-async def setup_hook():
-    global schedule, current_date
+async def on_ready():
+    global current_date
+    global schedule
     channel = bot.get_channel(1103827849007333447) # Channel to send updates in
     current_date = date.today()
     schedule = await(get_schedule(mlb))

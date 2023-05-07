@@ -114,7 +114,7 @@ async def list(ctx, *args):
         else:
             await ctx.send(', '.join(players))
 
-@tasks.loop(seconds=15)
+@tasks.loop(seconds=150)
 async def update(channel):
     global current_date
     global schedule

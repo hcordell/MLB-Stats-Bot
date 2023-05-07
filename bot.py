@@ -113,8 +113,8 @@ async def list(ctx, *args):
             await ctx.send(', '.join(players))
 
 @tasks.loop(seconds=150)
-async def update(channel, current_date):
-    if current_date != date.today() or not schedule:
+async def update(channel, current_date, schedule):
+    if current_date != date.today():
         schedule = await get_schedule(mlb)
         current_date = date.today()
     for player in players:
@@ -133,6 +133,7 @@ async def update(channel, current_date):
 async def on_ready():
     channel = bot.get_channel(1103827849007333447) # Channel to send updates in
     current_date = date.today()
-    update.start(channel, current_date)
+    schedule = await(get_schedule(mlb))
+    update.start(channel, current_date, schedule)
 
 bot.run(TOKEN)

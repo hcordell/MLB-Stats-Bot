@@ -133,11 +133,14 @@ async def update(channel):
 
 @bot.event
 async def on_ready():
+    channel = bot.get_channel(1103827849007333447) # Channel to send updates in
+    update.start(channel)
+
+@bot.event
+async def setup_hook():
     global current_date
     global schedule
-    channel = bot.get_channel(1103827849007333447) # Channel to send updates in
     current_date = date.today()
     schedule = await(get_schedule(mlb))
-    update.start(channel)
 
 bot.run(TOKEN)

@@ -52,6 +52,26 @@ def get_winpct(mlb, player, gameID):
     return winpct
 
 @unblock
+def get_status(mlb, player, playerID, gameID):
+    if player_attributes[f'{player}']['Position'] == 'batting':
+        try:
+            status = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].gamestatus.iscurrentbatter
+        except:
+            try:
+                status = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].gamestatus.iscurrentbatter
+            except:
+                status = None
+    elif player_attributes[f'{player}']['Position'] == 'pitching':
+        try:
+            status = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].gamestatus.iscurrentpitcher
+        except:
+            try:
+                status = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].gamestatus.iscurrentpitcher
+            except:
+                status = None
+    return status
+
+@unblock
 def get_stats(mlb, gameID, player, playerID, position):
     try:
         summary = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]["summary"]
@@ -133,6 +153,7 @@ async def update(channel):
     for player in players:
         if date_changed:
             player_attributes[f'{player}']['Game ID'] = None
+            player_attributes[f'{player}']['Win PCT'] = None
             player_attributes[f'{player}']['In Progress'] = True
         player_id = player_attributes[f'{player}']['Player ID']
         position = player_attributes[f'{player}']['Position']
@@ -143,12 +164,17 @@ async def update(channel):
                 if gameID:
                     player_stats = await get_stats(mlb, gameID, player, player_id, position)
                     actual_win_percent = await get_winpct(mlb, player, gameID)
+                    status = await get_status(mlb, player, player_id, gameID)
                 else:
                     player_stats = await get_stats(mlb, game.gamepk, player, player_id, position)
                     actual_win_percent = await get_winpct(mlb, player, game.gamepk)
+                    status = await get_status(mlb, player, player_id, game.gamepk)
                 if player_stats:
                     player_attributes[f'{player}']['In Progress'] = True
-                    summary = (f'{player}: {player_stats}')
+                    if status:
+                        summary = f'{player}: {player_stats} (Currently {position.capitalize()})'
+                    else:
+                        summary = f'{player}: {player_stats} (Not {position.capitalize()})'
                     print(stored_win_percent, actual_win_percent)
                     if stored_win_percent == None:
                         stored_win_percent = actual_win_percent

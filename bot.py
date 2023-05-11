@@ -86,7 +86,8 @@ async def add(ctx, *msgs):
                     'Player ID': player_name[0],
                     'Old Summary': None,
                     'Game ID': None,
-                    'Win PCT': None
+                    'Win PCT': None,
+                    'In Progress': True
                 }
                 player_position = await get_position(mlb, player, player_attributes)
                 if player_position == 'Pitcher':
@@ -132,30 +133,34 @@ async def update(channel):
     for player in players:
         if date_changed:
             player_attributes[f'{player}']['Game ID'] = None
+            player_attributes[f'{player}']['In Progress'] = True
         player_id = player_attributes[f'{player}']['Player ID']
         position = player_attributes[f'{player}']['Position']
         gameID = player_attributes[f'{player}']['Game ID']
         stored_win_percent = player_attributes[f'{player}']['Win PCT']
-        for game in schedule:
-            if gameID:
-                player_stats = await get_stats(mlb, gameID, player, player_id, position)
-                actual_win_percent = await get_winpct(mlb, player, gameID)
-            else:
-                player_stats = await get_stats(mlb, game.gamepk, player, player_id, position)
-                actual_win_percent = await get_winpct(mlb, player, game.gamepk)
-            if player_stats:
-                summary = (f'{player}: {player_stats}')
-                print(stored_win_percent, actual_win_percent)
-                if stored_win_percent == None:
-                    stored_win_percent = actual_win_percent
-                if stored_win_percent != actual_win_percent:
-                    summary = f'FINAL: {player} {player_stats}'
-                    await channel.send(summary)
-                    player_attributes[f'{player}']['Old Summary'] = summary
-                elif player_attributes[f'{player}']['Old Summary'] != summary:
-                    await channel.send(summary)
-                    player_attributes[f'{player}']['Old Summary'] = summary
-                break
+        if player_attributes[f'{player}']['In Progress'] == True:
+            for game in schedule:
+                if gameID:
+                    player_stats = await get_stats(mlb, gameID, player, player_id, position)
+                    actual_win_percent = await get_winpct(mlb, player, gameID)
+                else:
+                    player_stats = await get_stats(mlb, game.gamepk, player, player_id, position)
+                    actual_win_percent = await get_winpct(mlb, player, game.gamepk)
+                if player_stats:
+                    player_attributes[f'{player}']['In Progress'] = True
+                    summary = (f'{player}: {player_stats}')
+                    print(stored_win_percent, actual_win_percent)
+                    if stored_win_percent == None:
+                        stored_win_percent = actual_win_percent
+                    if stored_win_percent != actual_win_percent:
+                        summary = f'FINAL: {player} {player_stats}'
+                        player_attributes[f'{player}']['In Progress'] = False
+                        await channel.send(summary)
+                        player_attributes[f'{player}']['Old Summary'] = summary
+                    elif player_attributes[f'{player}']['Old Summary'] != summary:
+                        await channel.send(summary)
+                        player_attributes[f'{player}']['Old Summary'] = summary
+                    break
 
 @bot.event
 async def on_ready():

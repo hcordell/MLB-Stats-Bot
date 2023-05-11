@@ -88,7 +88,7 @@ def get_stats(mlb, gameID, player, playerID, position):
 @bot.command() # Bot command to add player
 @commands.has_role('Admins')
 async def add(ctx, *msgs):
-    if ctx.channel.id == 1103511198474960916: # Channel to send commands in
+    if ctx.channel.id == 996715384365396038: # Channel to send commands in
         player = ' '.join(msgs) # Capitalize the player's name
         player = player.split()
         i = 0
@@ -123,7 +123,7 @@ async def add(ctx, *msgs):
 @bot.command() # Bot command to remove player
 @commands.has_role('Admins')
 async def remove(ctx, *msg):
-    if ctx.channel.id == 1103511198474960916: # Channel to send commands in
+    if ctx.channel.id == 996715384365396038: # Channel to send commands in
         player = ' '.join(msg)
         if player in players:
             players.remove(player)
@@ -135,7 +135,7 @@ async def remove(ctx, *msg):
 @bot.command() # Bot command to print player list
 @commands.has_role('Admins')
 async def list(ctx, *args):
-    if ctx.channel.id == 1103511198474960916: # Channel to send commands in
+    if ctx.channel.id == 996715384365396038: # Channel to send commands in
         if len(players) == 0:
             await ctx.send('List is empty')
         else:
@@ -190,7 +190,7 @@ async def update(channel):
 
 @bot.event
 async def on_ready():
-    channel = bot.get_channel(1103827849007333447) # Channel to send updates in
+    channel = bot.get_channel(996715384365396038) # Channel to send updates in
     update.start(channel)
 
 @bot.event

@@ -47,6 +47,11 @@ def get_schedule(mlb):
     return schedule
 
 @unblock
+def get_winpct(mlb, player, gameID):
+    winpct = player_attributes[f'{player}']['Win PCT'] = mlb.get_game_box_score(gameID).teams.home.team.record.winningpercentage
+    return winpct
+
+@unblock
 def get_stats(mlb, gameID, player, playerID, position):
     try:
         summary = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]["summary"]
@@ -77,10 +82,11 @@ async def add(ctx, *msgs):
             if player_name: # Check if name matches player in database
                 players.append(player)
                 player_attributes[f'{player}'] = {
-                    'Position': '',
+                    'Position': None,
                     'Player ID': player_name[0],
-                    'Old Summary': '',
-                    'Game ID': ''
+                    'Old Summary': None,
+                    'Game ID': None,
+                    'Win PCT': None
                 }
                 player_position = await get_position(mlb, player, player_attributes)
                 if player_position == 'Pitcher':
@@ -125,18 +131,28 @@ async def update(channel):
         date_changed = True
     for player in players:
         if date_changed:
-            player_attributes[f'{player}']['Game ID'] = ''
+            player_attributes[f'{player}']['Game ID'] = None
         player_id = player_attributes[f'{player}']['Player ID']
         position = player_attributes[f'{player}']['Position']
         gameID = player_attributes[f'{player}']['Game ID']
+        stored_win_percent = player_attributes[f'{player}']['Win PCT']
         for game in schedule:
             if gameID:
                 player_stats = await get_stats(mlb, gameID, player, player_id, position)
+                actual_win_percent = await get_winpct(mlb, player, gameID)
             else:
                 player_stats = await get_stats(mlb, game.gamepk, player, player_id, position)
+                actual_win_percent = await get_winpct(mlb, player, game.gamepk)
             if player_stats:
                 summary = (f'{player}: {player_stats}')
-                if player_attributes[f'{player}']['Old Summary'] != summary:
+                print(stored_win_percent, actual_win_percent)
+                if stored_win_percent == None:
+                    stored_win_percent = actual_win_percent
+                if stored_win_percent != actual_win_percent:
+                    summary = f'FINAL: {player} {player_stats}'
+                    await channel.send(summary)
+                    player_attributes[f'{player}']['Old Summary'] = summary
+                elif player_attributes[f'{player}']['Old Summary'] != summary:
                     await channel.send(summary)
                     player_attributes[f'{player}']['Old Summary'] = summary
                 break

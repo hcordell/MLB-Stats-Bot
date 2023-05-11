@@ -86,7 +86,7 @@ def get_stats(mlb, gameID, player, playerID, position):
     return None
 
 @bot.command() # Bot command to add player
-#@commands.has_any_role('Admins', 'Moderator')
+@commands.has_role('Admins')
 async def add(ctx, *msgs):
     if ctx.channel.id == 1103511198474960916: # Channel to send commands in
         player = ' '.join(msgs) # Capitalize the player's name
@@ -121,7 +121,7 @@ async def add(ctx, *msgs):
             await ctx.send('Error: player already in list')
 
 @bot.command() # Bot command to remove player
-#@commands.has_any_role('Admins', 'Moderator')
+@commands.has_role('Admins')
 async def remove(ctx, *msg):
     if ctx.channel.id == 1103511198474960916: # Channel to send commands in
         player = ' '.join(msg)
@@ -133,7 +133,7 @@ async def remove(ctx, *msg):
             await ctx.send('Error: Player not found')
 
 @bot.command() # Bot command to print player list
-#@commands.has_any_role('Admins', 'Moderator')
+@commands.has_role('Admins')
 async def list(ctx, *args):
     if ctx.channel.id == 1103511198474960916: # Channel to send commands in
         if len(players) == 0:

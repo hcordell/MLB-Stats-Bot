@@ -24,20 +24,26 @@ players = [] # List of players
 player_uuids = {} # List of player UUIDs
 player_attributes = {} # Dictionary of details about players
 
-async def fetch(session, url):
-    async with session.get(url) as response:
-        return await response.json()
+class TheShowPrices:
+    def __init__(self) -> None:
+        self.session = aiohttp.ClientSession()
 
-async def main():
-    async with aiohttp.ClientSession() as session:
-        for x in range(1, 74):
-            data = await fetch(session, f'https://mlb23.theshow.com/apis/listings.json?type=mlb_card&page={x}&series_id=1337')
-            for y in range(25):
-                try:
-                    player_uuids[f"{data['listings'][y]['listing_name']}"] = f"{data['listings'][y]['item']['uuid']}"
-                except:
-                    break
-        await session.close()
+    async def fetch(self, url):
+        async with self.session.get(url) as response:
+            return await response.json()
+    
+    async def close(self):
+        await self.session.close()
+
+async def main(PriceTool):
+    for x in range(1, 74):
+        data = await PriceTool.fetch(f'https://mlb23.theshow.com/apis/listings.json?type=mlb_card&page={x}&series_id=1337')
+        for y in range(25):
+            try:
+                player_uuids[f"{data['listings'][y]['listing_name']}"] = f"{data['listings'][y]['item']['uuid']}"
+            except:
+                break
+    await PriceTool.close()
 
 def unblock(func: typing.Callable) -> typing.Coroutine:
     @functools.wraps(func)
@@ -214,8 +220,10 @@ async def on_ready():
 async def setup_hook():
     global current_date
     global schedule
+    global PriceTool
     current_date = date.today()
     schedule = await(get_schedule(mlb))
-    asyncio.run(main())
+    PriceTool = TheShowPrices()
+    asyncio.run(main(PriceTool))
 
 bot.run(TOKEN)

@@ -21,6 +21,7 @@ bot = commands.Bot(command_prefix='!', intents=intents) # Setup bot to read comm
 mlb = mlbstatsapi.Mlb() # Initalize MLB API
 
 players = [] # List of players
+player_prices = [] # List of players to price check
 player_uuids = {} # List of player UUIDs
 player_attributes = {} # Dictionary of details about players
 
@@ -164,6 +165,12 @@ async def list(ctx, *args):
         else:
             await ctx.send(', '.join(players))
 
+@bot.command() # Bot command to add buy alert
+@commands.has_role('Admins')
+async def addAlert(ctx, *name, price):
+    if ctx.channel.id == 1103511198474960916: # Channel to send commands in
+        print(' '.join(name))
+
 @tasks.loop(seconds=150)
 async def update(channel):
     global current_date
@@ -211,10 +218,16 @@ async def update(channel):
                         player_attributes[f'{player}']['Old Summary'] = summary
                     break
 
+@tasks.loop(seconds=120)
+async def update_prices(PriceTool):
+    pass
+
 @bot.event
 async def on_ready():
+    global PriceTool
     channel = bot.get_channel(1103827849007333447) # Channel to send updates in
     update.start(channel)
+    update_prices.start(PriceTool)
 
 @bot.event
 async def setup_hook():

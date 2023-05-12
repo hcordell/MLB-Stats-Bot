@@ -21,7 +21,23 @@ bot = commands.Bot(command_prefix='!', intents=intents) # Setup bot to read comm
 mlb = mlbstatsapi.Mlb() # Initalize MLB API
 
 players = [] # List of players
+player_uuids = {} # List of player UUIDs
 player_attributes = {} # Dictionary of details about players
+
+async def fetch(session, url):
+    async with session.get(url) as response:
+        return await response.json()
+
+async def main():
+    async with aiohttp.ClientSession() as session:
+        for x in range(1, 74):
+            data = await fetch(session, f'https://mlb23.theshow.com/apis/listings.json?type=mlb_card&page={x}&series_id=1337')
+            for y in range(25):
+                try:
+                    player_uuids[f"{data['listings'][y]['listing_name']}"] = f"{data['listings'][y]['item']['uuid']}"
+                except:
+                    break
+        await session.close()
 
 def unblock(func: typing.Callable) -> typing.Coroutine:
     @functools.wraps(func)
@@ -89,7 +105,7 @@ def get_stats(mlb, gameID, player, playerID, position):
 @bot.command() # Bot command to add player
 @commands.has_role('Admins')
 async def add(ctx, *msgs):
-    if ctx.channel.id == 996715384365396038: # Channel to send commands in
+    if ctx.channel.id == 1103511198474960916: # Channel to send commands in
         player = ' '.join(msgs) # Capitalize the player's name
         player = player.split()
         i = 0
@@ -124,7 +140,7 @@ async def add(ctx, *msgs):
 @bot.command() # Bot command to remove player
 @commands.has_role('Admins')
 async def remove(ctx, *msg):
-    if ctx.channel.id == 996715384365396038: # Channel to send commands in
+    if ctx.channel.id == 1103511198474960916: # Channel to send commands in
         player = ' '.join(msg)
         if player in players:
             players.remove(player)
@@ -136,7 +152,7 @@ async def remove(ctx, *msg):
 @bot.command() # Bot command to print player list
 @commands.has_role('Admins')
 async def list(ctx, *args):
-    if ctx.channel.id == 996715384365396038: # Channel to send commands in
+    if ctx.channel.id == 1103511198474960916: # Channel to send commands in
         if len(players) == 0:
             await ctx.send('List is empty')
         else:
@@ -191,7 +207,7 @@ async def update(channel):
 
 @bot.event
 async def on_ready():
-    channel = bot.get_channel(996715384365396038) # Channel to send updates in
+    channel = bot.get_channel(1103827849007333447) # Channel to send updates in
     update.start(channel)
 
 @bot.event
@@ -200,5 +216,6 @@ async def setup_hook():
     global schedule
     current_date = date.today()
     schedule = await(get_schedule(mlb))
+    asyncio.run(main())
 
 bot.run(TOKEN)

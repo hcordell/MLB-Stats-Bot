@@ -122,6 +122,7 @@ async def add(ctx, *name):
                 player_attributes[f'{player}'] = {
                     'Position': None,
                     'Price': None,
+                    'Allow Alert': True,
                     'Player ID': player_name[0],
                     'Old Summary': None,
                     'Game ID': None,
@@ -256,7 +257,11 @@ async def update_prices(channel):
         player_upper = capwords(player)
         desired_price = player_attributes[f'{player_upper}']['Price']
         if current_price <= desired_price:
-            await channel.send(f'BUY ALERT: {player_upper} is {current_price} stubs!')
+            if player_attributes[f'{player_upper}']['Allow Alerts']:
+                await channel.send(f'BUY ALERT: {player_upper} is under {desired_price} stubs!')
+                player_attributes[f'{player_upper}']['Allow Alerts'] = False
+        elif current_price >= desired_price:
+            player_attributes[f'{player_upper}']['Allow Alerts'] = True
     await PriceTool.close()
 
 

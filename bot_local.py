@@ -260,7 +260,7 @@ async def update_prices(channel):
             if player_attributes[f'{player_upper}']['Allow Alerts']:
                 await channel.send(f'BUY ALERT: {player_upper} is under {desired_price} stubs!')
                 player_attributes[f'{player_upper}']['Allow Alerts'] = False
-        elif current_price >= desired_price:
+        elif current_price > desired_price:
             player_attributes[f'{player_upper}']['Allow Alerts'] = True
     await PriceTool.close()
 

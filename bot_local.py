@@ -237,7 +237,7 @@ async def update(channel):
                     print(stored_win_percent, actual_win_percent)
                     if stored_win_percent == None:
                         stored_win_percent = actual_win_percent
-                    if stored_win_percent != actual_win_percent:
+                    if stored_win_percent != actual_win_percent and player_stats != '0-0':
                         summary = f'FINAL: {player} {player_stats}'
                         player_attributes[f'{player}']['In Progress'] = False
                         await channel.send(summary)

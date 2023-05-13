@@ -230,10 +230,12 @@ async def update(channel):
                     status = await get_status(mlb, player, player_id, game.gamepk)
                 if player_stats:
                     player_attributes[f'{player}']['In Progress'] = True
-                    if status:
+                    if status and position == 'pitching':
                         summary = f'{player}: {player_stats} (Currently {position.capitalize()})'
-                    else:
+                    elif position == 'pitching':
                         summary = f'{player}: {player_stats} (Not {position.capitalize()})'
+                    else:
+                        summary = f'{player}: {player_stats}'
                     print(stored_win_percent, actual_win_percent)
                     if stored_win_percent == None:
                         stored_win_percent = actual_win_percent

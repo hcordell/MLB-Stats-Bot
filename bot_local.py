@@ -8,6 +8,7 @@ import aiohttp
 import typing
 from datetime import date
 from dotenv import load_dotenv
+from string import capwords
 from discord.ext import commands, tasks
 
 load_dotenv()
@@ -41,7 +42,7 @@ async def main(PriceTool):
         data = await PriceTool.fetch(f'https://mlb23.theshow.com/apis/listings.json?type=mlb_card&page={x}&series_id=1337')
         for y in range(25):
             try:
-                player_uuids[f"{data['listings'][y]['listing_name']}"] = f"{data['listings'][y]['item']['uuid']}"
+                player_uuids[f"{data['listings'][y]['listing_name']}".lower()] = f"{data['listings'][y]['item']['uuid']}"
             except:
                 break
     await PriceTool.close()
@@ -111,22 +112,16 @@ def get_stats(mlb, gameID, player, playerID, position):
 
 @bot.command() # Bot command to add player
 @commands.has_role('Admins')
-async def add(ctx, *msgs):
+async def add(ctx, *name):
     if ctx.channel.id == 1103511198474960916: # Channel to send commands in
-        player = ' '.join(msgs) # Capitalize the player's name
-        player = player.split()
-        i = 0
-        for name in player:
-            player[i] = name.capitalize()
-            i += 1
-        player = ' '.join(player)
-
+        player = capwords(' '.join(name))
         if player not in players:
             player_name = await get_player(mlb, player)
             if player_name: # Check if name matches player in database
                 players.append(player)
                 player_attributes[f'{player}'] = {
                     'Position': None,
+                    'Price': None,
                     'Player ID': player_name[0],
                     'Old Summary': None,
                     'Game ID': None,
@@ -154,22 +149,55 @@ async def remove(ctx, *msg):
             player_attributes.pop(player)
             await ctx.send('Success: player removed')
         else:
-            await ctx.send('Error: Player not found')
+            await ctx.send('Error: player not found')
 
 @bot.command() # Bot command to print player list
 @commands.has_role('Admins')
 async def list(ctx, *args):
     if ctx.channel.id == 1103511198474960916: # Channel to send commands in
         if len(players) == 0:
-            await ctx.send('List is empty')
+            await ctx.send('Error: list is empty')
         else:
             await ctx.send(', '.join(players))
 
 @bot.command() # Bot command to add buy alert
 @commands.has_role('Admins')
-async def addAlert(ctx, *name, price):
+async def addAlert(ctx, *name):
     if ctx.channel.id == 1103511198474960916: # Channel to send commands in
-        print(' '.join(name))
+        try:
+            price = int(name[-1])
+            player_upper = capwords(' '.join(name[:-1]))
+            player = player_upper.lower()
+            if player not in player_prices:
+                player_attributes[f'{player_upper}']['Price'] = price
+                player_prices.append(player)
+                await ctx.send('Success: alert added')
+            else:
+                await ctx.send('Error: player already in list')
+        except:
+            await ctx.send('Error: player not added or invalid syntax')
+
+@bot.command() # Bot command to remove buy alert
+@commands.has_role('Admins')
+async def removeAlert(ctx, *name):
+    if ctx.channel.id == 1103511198474960916: # Channel to send commands in
+        player = (' '.join(name)).lower()
+        if player in player_prices:
+            player_prices.remove(player)
+            player_attributes[f'{capwords(player)}']['Price'] = None
+            await ctx.send('Success: alert removed')
+        else:
+            await ctx.send('Error: player not found')
+
+@bot.command() # Bot command to list all buy alerts
+@commands.has_role('Admins')
+async def listAlerts(ctx):
+    if ctx.channel.id == 1103511198474960916: # Channel to send commands in
+        if len(player_prices) == 0:
+            await ctx.send('Error: list is empty')
+        else:
+            alert_list = [f"{capwords(player)} [{player_attributes[capwords(player)]['Price']}]" for player in player_prices]
+            await ctx.send(', '.join(alert_list))
 
 @tasks.loop(seconds=150)
 async def update(channel):
@@ -218,25 +246,34 @@ async def update(channel):
                         player_attributes[f'{player}']['Old Summary'] = summary
                     break
 
-@tasks.loop(seconds=120)
-async def update_prices(PriceTool):
-    pass
+@tasks.loop(seconds=60)
+async def update_prices(channel):
+    PriceTool = TheShowPrices()
+    for player in player_prices:
+        uuid = player_uuids[f'{player}']
+        data = await PriceTool.fetch(f'https://mlb23.theshow.com/apis/listing.json?uuid={uuid}')
+        current_price = data['best_sell_price']
+        player_upper = capwords(player)
+        desired_price = player_attributes[f'{player_upper}']['Price']
+        if current_price <= desired_price:
+            await channel.send(f'BUY ALERT: {player_upper} is {current_price} stubs!')
+    await PriceTool.close()
+
 
 @bot.event
 async def on_ready():
-    global PriceTool
     channel = bot.get_channel(1103827849007333447) # Channel to send updates in
+    price_alerts = bot.get_channel(1106596697112596510) # Channel to send price updates in
     update.start(channel)
-    update_prices.start(PriceTool)
+    update_prices.start(price_alerts)
 
 @bot.event
 async def setup_hook():
     global current_date
     global schedule
-    global PriceTool
     current_date = date.today()
-    schedule = await(get_schedule(mlb))
+    schedule = await get_schedule(mlb)
     PriceTool = TheShowPrices()
-    asyncio.run(main(PriceTool))
+    await main(PriceTool)
 
 bot.run(TOKEN)

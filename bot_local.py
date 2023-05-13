@@ -253,7 +253,7 @@ async def update_prices(channel):
     for player in player_prices:
         uuid = player_uuids[f'{player}']
         data = await PriceTool.fetch(f'https://mlb23.theshow.com/apis/listing.json?uuid={uuid}')
-        current_price = data['best_sell_price']
+        current_price = data['best_buy_price']
         player_upper = capwords(player)
         desired_price = player_attributes[f'{player_upper}']['Price']
         if current_price <= desired_price:

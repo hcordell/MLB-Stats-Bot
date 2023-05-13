@@ -122,7 +122,7 @@ async def add(ctx, *name):
                 player_attributes[f'{player}'] = {
                     'Position': None,
                     'Price': None,
-                    'Allow Alert': True,
+                    'Allow Alerts': True,
                     'Player ID': player_name[0],
                     'Old Summary': None,
                     'Game ID': None,

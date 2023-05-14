@@ -114,14 +114,15 @@ def get_stats(mlb, gameID, player, playerID, position):
 @commands.has_role('Admins')
 async def add(ctx, *name):
     if ctx.channel.id == 996715384365396038: # Channel to send commands in
-        player = capwords(' '.join(name))
+        player = capwords(' '.join(name[:-1]))
         if player not in players:
             player_name = await get_player(mlb, player)
             if player_name: # Check if name matches player in database
                 players.append(player)
+                player_prices.add(player.lower())
                 player_attributes[f'{player}'] = {
                     'Position': None,
-                    'Price': None,
+                    'Price': int(name[-1]),
                     'Allow Alerts': True,
                     'Player ID': player_name[0],
                     'Old Summary': None,
@@ -144,9 +145,10 @@ async def add(ctx, *name):
 @commands.has_role('Admins')
 async def remove(ctx, *msg):
     if ctx.channel.id == 996715384365396038: # Channel to send commands in
-        player = ' '.join(msg)
+        player = capwords(' '.join(msg))
         if player in players:
             players.remove(player)
+            player_prices.remove(player.lower())
             player_attributes.pop(player)
             await ctx.send('Success: player removed')
         else:
@@ -157,44 +159,6 @@ async def remove(ctx, *msg):
 async def list(ctx, *args):
     if ctx.channel.id == 996715384365396038: # Channel to send commands in
         if len(players) == 0:
-            await ctx.send('Error: list is empty')
-        else:
-            await ctx.send(', '.join(players))
-
-@bot.command() # Bot command to add buy alert
-@commands.has_role('Admins')
-async def addAlert(ctx, *name):
-    if ctx.channel.id == 1107027549382516766: # Channel to send commands in
-        try:
-            price = int(name[-1])
-            player_upper = capwords(' '.join(name[:-1]))
-            player = player_upper.lower()
-            if player not in player_prices:
-                player_attributes[f'{player_upper}']['Price'] = price
-                player_prices.append(player)
-                await ctx.send('Success: alert added')
-            else:
-                await ctx.send('Error: player already in list')
-        except:
-            await ctx.send('Error: player not added or invalid syntax')
-
-@bot.command() # Bot command to remove buy alert
-@commands.has_role('Admins')
-async def removeAlert(ctx, *name):
-    if ctx.channel.id == 1107027549382516766: # Channel to send commands in
-        player = (' '.join(name)).lower()
-        if player in player_prices:
-            player_prices.remove(player)
-            player_attributes[f'{capwords(player)}']['Price'] = None
-            await ctx.send('Success: alert removed')
-        else:
-            await ctx.send('Error: player not found')
-
-@bot.command() # Bot command to list all buy alerts
-@commands.has_role('Admins')
-async def listAlerts(ctx):
-    if ctx.channel.id == 1107027549382516766: # Channel to send commands in
-        if len(player_prices) == 0:
             await ctx.send('Error: list is empty')
         else:
             alert_list = [f"{capwords(player)} [{player_attributes[capwords(player)]['Price']}]" for player in player_prices]

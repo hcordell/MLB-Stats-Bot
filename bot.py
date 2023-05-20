@@ -22,7 +22,7 @@ bot = commands.Bot(command_prefix='!', intents=intents) # Setup bot to read comm
 mlb = mlbstatsapi.Mlb() # Initalize MLB API
 
 players = [] # List of players
-player_prices = [] # List of players to price check
+player_prices = set() # List of players to price check
 player_uuids = {} # List of player UUIDs
 player_attributes = {} # Dictionary of details about players
 

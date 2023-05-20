@@ -155,7 +155,7 @@ async def remove(ctx, *msg):
             await ctx.send('Error: player not found')
 
 @bot.command() # Bot command to print player list
-@commands.has_role('Admins')
+@commands.has_permissions('Admins')
 async def list(ctx, *args):
     if ctx.channel.id == 1103511198474960916: # Channel to send commands in
         if len(players) == 0:

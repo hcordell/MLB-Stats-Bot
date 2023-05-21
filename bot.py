@@ -110,18 +110,21 @@ def get_stats(mlb, gameID, player, playerID, position):
         return summary
     return None
 
-@bot.command() # Bot command to add player
+@bot.command() # Bot command to create a buy alert for a player
 @commands.has_role('Admins')
-async def add(ctx, *name):
+async def buy(ctx, *name):
     if ctx.channel.id == 1109551093081448508: # Channel to send commands in
         player = capwords(' '.join(name[:-1]))
-        if player not in players:
+        if name[-1].isnumeric == False:
+            await ctx.send('Error: price not specified')
+        elif player not in players:
             player_name = await get_player(mlb, player)
             if player_name: # Check if name matches player in database
                 players.append(player)
                 player_prices.add(player.lower())
                 player_attributes[f'{player}'] = {
                     'Position': None,
+                    'Type': 'Buy',
                     'Price': int(name[-1]),
                     'Allow Alerts': True,
                     'Player ID': player_name[0],
@@ -141,6 +144,20 @@ async def add(ctx, *name):
                 await ctx.send('Error: player not found')
         else:
             await ctx.send('Error: player already in list')
+
+@bot.command() # Bot command to create a sell alert for a player
+@commands.has_role('Admins')
+async def sell(ctx, *msg):
+    if ctx.channel.id == 1109551093081448508:
+        if msg[-1].isnumeric() == False:
+            await ctx.send('Error: no price specified')
+        else:
+            player = capwords(' '.join(msg[:-1]))
+            sell_price = int(msg[-1])
+            player_attributes[f'{player}']['Type'] = 'Sell'
+            player_attributes[f'{player}']['Price'] = sell_price
+            player_attributes[f'{player}']['Allow Alerts'] = True
+            await ctx.send('Success: sell alert created')
 
 @bot.command() # Bot command to remove player
 @commands.has_role('Admins')
@@ -162,7 +179,7 @@ async def list(ctx, *args):
         if len(players) == 0:
             await ctx.send('Error: list is empty')
         else:
-            alert_list = [f"{capwords(player)} [{player_attributes[capwords(player)]['Price']}]" for player in player_prices]
+            alert_list = [f"[{player_attributes[f'{capwords(player)}']['Type']}] {capwords(player)} [{player_attributes[capwords(player)]['Price']}]" for player in player_prices]
             await ctx.send(', '.join(alert_list))
 
 @tasks.loop(seconds=120)
@@ -227,17 +244,29 @@ async def update(channel):
 async def update_prices(channel):
     PriceTool = TheShowPrices()
     for player in player_prices:
-        uuid = player_uuids[f'{player}']
-        data = await PriceTool.fetch(f'https://mlb23.theshow.com/apis/listing.json?uuid={uuid}')
-        current_price = data['best_buy_price']
         player_upper = capwords(player)
-        desired_price = player_attributes[f'{player_upper}']['Price']
-        if current_price <= desired_price:
-            if player_attributes[f'{player_upper}']['Allow Alerts']:
-                await channel.send(f'BUY ALERT: {player_upper} is under {desired_price} stubs!')
-                player_attributes[f'{player_upper}']['Allow Alerts'] = False
-        elif current_price > desired_price:
-            player_attributes[f'{player_upper}']['Allow Alerts'] = True
+        uuid = player_uuids[f'{player}']
+        alert_type = player_attributes[f'{player_upper}']['Type']
+        data = await PriceTool.fetch(f'https://mlb23.theshow.com/apis/listing.json?uuid={uuid}')
+        if alert_type == 'Buy':
+            current_price = data['best_buy_price']
+            desired_price = player_attributes[f'{player_upper}']['Price']
+            if current_price <= desired_price:
+                if player_attributes[f'{player_upper}']['Allow Alerts']:
+                    await channel.send(f'BUY ALERT: {player_upper} is under {desired_price} stubs!')
+                    player_attributes[f'{player_upper}']['Allow Alerts'] = False
+            elif current_price > desired_price:
+                player_attributes[f'{player_upper}']['Allow Alerts'] = True
+        elif alert_type == 'Sell':
+            current_price = data['best_sell_price']
+            desired_price = player_attributes[f'{player_upper}']['Price']
+            print(current_price, desired_price)
+            if current_price >= desired_price:
+                if player_attributes[f'{player_upper}']['Allow Alerts']:
+                    await channel.send(f'SELL ALERT: {player_upper} is over {desired_price} stubs!')
+                    player_attributes[f'{player_upper}']['Allow Alerts'] = False
+            elif current_price < desired_price:
+                player_attributes[f'{player_upper}']['Allow Alerts'] = True
     await PriceTool.close()
 
 

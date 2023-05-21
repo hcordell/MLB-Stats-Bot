@@ -210,14 +210,14 @@ async def update(channel):
                         player_attributes[f'{player}']['In Progress'] = False
                         player_attributes[f'{player}']['Old Summary'] = summary
                         if message:
-                            message.delete()
+                            await message.delete()
                             player_attributes[f'{player}']['Message'] = await channel.send(summary)
                         else:
                             player_attributes[f'{player}']['Message'] = await channel.send(summary)
                     elif player_attributes[f'{player}']['Old Summary'] != summary:
                         player_attributes[f'{player}']['Old Summary'] = summary
                         if message:
-                            message.delete()
+                            await message.delete()
                             player_attributes[f'{player}']['Message'] = await channel.send(summary)
                         else:
                             player_attributes[f'{player}']['Message'] = await channel.send(summary)

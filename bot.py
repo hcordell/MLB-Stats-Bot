@@ -128,7 +128,8 @@ async def add(ctx, *name):
                     'Old Summary': None,
                     'Game ID': None,
                     'Win PCT': None,
-                    'In Progress': True
+                    'In Progress': True,
+                    'Message': None
                 }
                 player_position = await get_position(mlb, player, player_attributes)
                 if player_position == 'Pitcher':
@@ -164,7 +165,7 @@ async def list(ctx, *args):
             alert_list = [f"{capwords(player)} [{player_attributes[capwords(player)]['Price']}]" for player in player_prices]
             await ctx.send(', '.join(alert_list))
 
-@tasks.loop(seconds=150)
+@tasks.loop(seconds=120)
 async def update(channel):
     global current_date
     global schedule
@@ -182,6 +183,7 @@ async def update(channel):
         position = player_attributes[f'{player}']['Position']
         gameID = player_attributes[f'{player}']['Game ID']
         stored_win_percent = player_attributes[f'{player}']['Win PCT']
+        message = player_attributes[f'{player}']['Message']
         if player_attributes[f'{player}']['In Progress'] == True:
             for game in schedule:
                 if gameID:
@@ -206,11 +208,19 @@ async def update(channel):
                     if stored_win_percent != actual_win_percent and player_stats != '0-0':
                         summary = f'FINAL: {player} {player_stats}'
                         player_attributes[f'{player}']['In Progress'] = False
-                        await channel.send(summary)
                         player_attributes[f'{player}']['Old Summary'] = summary
+                        if message:
+                            message.delete()
+                            player_attributes[f'{player}']['Message'] = await channel.send(summary)
+                        else:
+                            player_attributes[f'{player}']['Message'] = await channel.send(summary)
                     elif player_attributes[f'{player}']['Old Summary'] != summary:
-                        await channel.send(summary)
                         player_attributes[f'{player}']['Old Summary'] = summary
+                        if message:
+                            message.delete()
+                            player_attributes[f'{player}']['Message'] = await channel.send(summary)
+                        else:
+                            player_attributes[f'{player}']['Message'] = await channel.send(summary)
                     break
 
 @tasks.loop(seconds=60)

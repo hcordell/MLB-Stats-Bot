@@ -128,7 +128,8 @@ async def add(ctx, *name):
                     'Old Summary': None,
                     'Game ID': None,
                     'Win PCT': None,
-                    'In Progress': True
+                    'In Progress': True,
+                    'Message': None
                 }
                 player_position = await get_position(mlb, player, player_attributes)
                 if player_position == 'Pitcher':
@@ -164,7 +165,13 @@ async def list(ctx, *args):
             alert_list = [f"{capwords(player)} [{player_attributes[capwords(player)]['Price']}]" for player in player_prices]
             await ctx.send(', '.join(alert_list))
 
-@tasks.loop(seconds=150)
+@bot.command()
+async def updateMSG(ctx, *args):
+    message = player_attributes[f'{players[0]}']['Message']
+    if message:
+        await message.delete()
+
+@tasks.loop(seconds=60)
 async def update(channel):
     global current_date
     global schedule
@@ -206,10 +213,10 @@ async def update(channel):
                     if stored_win_percent != actual_win_percent and player_stats != '0-0':
                         summary = f'FINAL: {player} {player_stats}'
                         player_attributes[f'{player}']['In Progress'] = False
-                        await channel.send(summary)
+                        player_attributes[f'{player}']['Message'] = await channel.send(summary)
                         player_attributes[f'{player}']['Old Summary'] = summary
                     elif player_attributes[f'{player}']['Old Summary'] != summary:
-                        await channel.send(summary)
+                        player_attributes[f'{player}']['Message'] = await channel.send(summary)
                         player_attributes[f'{player}']['Old Summary'] = summary
                     break
 

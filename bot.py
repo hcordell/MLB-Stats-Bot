@@ -113,7 +113,7 @@ def get_stats(mlb, gameID, player, playerID, position):
     return None
 
 @bot.command() # Bot command to create a buy alert for a player
-@commands.has_role('Admins')
+#@commands.has_role('Admins')
 async def buy(ctx, *name):
     if ctx.channel.id == (1109551093081448508 or 1107033145846534245): # Channel to send commands in
         player = capwords(' '.join(name[:-1]))
@@ -162,7 +162,7 @@ async def sell(ctx, *msg):
             await ctx.send('Success: sell alert created')
 
 @bot.command() # Bot command to remove player
-@commands.has_role('Admins')
+#@commands.has_role('Admins')
 async def remove(ctx, *msg):
     if ctx.channel.id == (1109551093081448508 or 1107033145846534245): # Channel to send commands in
         player = capwords(' '.join(msg))
@@ -175,7 +175,7 @@ async def remove(ctx, *msg):
             await ctx.send('Error: player not found')
 
 @bot.command() # Bot command to print player list
-@commands.has_role('Admins')
+#@commands.has_role('Admins')
 async def list(ctx, *args):
     if ctx.channel.id == (1109551093081448508 or 1107033145846534245): # Channel to send commands in
         if len(players) == 0:

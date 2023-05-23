@@ -6,6 +6,7 @@ import functools
 import asyncio
 import aiohttp
 import typing
+import certifi
 from datetime import date
 from dotenv import load_dotenv
 from string import capwords
@@ -17,8 +18,8 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 PASSWORD = os.getenv('PASSWORD')
 
-url = f"mongodb+srv://Chimaezss:{PASSWORD}@mlbstatsbotdb.wcpwbzb.mongodb.net/?retryWrites=true&w=majority"
-client = AsyncIOMotorClient(url, server_api=ServerApi('1'))
+uri = f"mongodb+srv://Chimaezss:{PASSWORD}@mlbstatsbotdb.wcpwbzb.mongodb.net/?retryWrites=true&w=majority&tls=true"
+client = AsyncIOMotorClient(uri, server_api=ServerApi('1'), tlsCAFile=certifi.where())
 
 intents = discord.Intents.default() # Set parameters for discord bot
 intents.message_content = True

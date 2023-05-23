@@ -100,10 +100,12 @@ def get_status(mlb, player, playerID, gameID):
 def get_stats(mlb, gameID, player, playerID, position):
     try:
         summary = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]["summary"]
-    except:
+    except Exception as e0:
+        print(e0)
         try:
             summary = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]["summary"]
-        except:
+        except Exception as e:
+            print(e)
             return None
     if summary:
         player_attributes[f'{player}']['Game ID'] = gameID
@@ -113,7 +115,7 @@ def get_stats(mlb, gameID, player, playerID, position):
 @bot.command() # Bot command to create a buy alert for a player
 @commands.has_role('Admins')
 async def buy(ctx, *name):
-    if ctx.channel.id == 1109551093081448508: # Channel to send commands in
+    if ctx.channel.id == (1109551093081448508 or 1107033145846534245): # Channel to send commands in
         player = capwords(' '.join(name[:-1]))
         if name[-1].isnumeric == False:
             await ctx.send('Error: price not specified')
@@ -162,7 +164,7 @@ async def sell(ctx, *msg):
 @bot.command() # Bot command to remove player
 @commands.has_role('Admins')
 async def remove(ctx, *msg):
-    if ctx.channel.id == 1109551093081448508: # Channel to send commands in
+    if ctx.channel.id == (1109551093081448508 or 1107033145846534245): # Channel to send commands in
         player = capwords(' '.join(msg))
         if player in players:
             players.remove(player)
@@ -175,14 +177,14 @@ async def remove(ctx, *msg):
 @bot.command() # Bot command to print player list
 @commands.has_role('Admins')
 async def list(ctx, *args):
-    if ctx.channel.id == 1109551093081448508: # Channel to send commands in
+    if ctx.channel.id == (1109551093081448508 or 1107033145846534245): # Channel to send commands in
         if len(players) == 0:
             await ctx.send('Error: list is empty')
         else:
             alert_list = [f"[{player_attributes[f'{capwords(player)}']['Type']}] {capwords(player)} [{player_attributes[capwords(player)]['Price']}]" for player in player_prices]
             await ctx.send(', '.join(alert_list))
 
-@tasks.loop(seconds=120)
+@tasks.loop(seconds=150)
 async def update(channel):
     global current_date
     global schedule
@@ -192,6 +194,7 @@ async def update(channel):
         current_date = date.today()
         date_changed = True
     for player in players:
+        asyncio.sleep(30)
         if date_changed:
             player_attributes[f'{player}']['Game ID'] = None
             player_attributes[f'{player}']['Win PCT'] = None
@@ -240,7 +243,7 @@ async def update(channel):
                             player_attributes[f'{player}']['Message'] = await channel.send(summary)
                     break
 
-@tasks.loop(seconds=60)
+@tasks.loop(minutes=60)
 async def update_prices(channel):
     PriceTool = TheShowPrices()
     for player in player_prices:

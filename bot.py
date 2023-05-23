@@ -10,9 +10,15 @@ from datetime import date
 from dotenv import load_dotenv
 from string import capwords
 from discord.ext import commands, tasks
+from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo.server_api import ServerApi
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
+PASSWORD = os.getenv('PASSWORD')
+
+url = f"mongodb+srv://Chimaezss:{PASSWORD}@mlbstatsbotdb.wcpwbzb.mongodb.net/?retryWrites=true&w=majority"
+client = AsyncIOMotorClient(url, server_api=ServerApi('1'))
 
 intents = discord.Intents.default() # Set parameters for discord bot
 intents.message_content = True
@@ -21,8 +27,7 @@ bot = commands.Bot(command_prefix='!', intents=intents) # Setup bot to read comm
 
 mlb = mlbstatsapi.Mlb() # Initalize MLB API
 
-players = [] # List of players
-player_prices = set() # List of players to price check
+players = set() # List of players
 player_uuids = {} # List of player UUIDs
 player_attributes = {} # Dictionary of details about players
 
@@ -37,12 +42,21 @@ class TheShowPrices:
     async def close(self):
         await self.session.close()
 
+async def loadData():
+    player_collection = client.players.players
+    docs = player_collection.find()
+    player_list = await docs.to_list(length=None)
+    for player in player_list:
+        players.add(player['Name'])
+        player_attributes[f'{player["Name"]}'] = player['Attributes']
+
 async def main(PriceTool):
     for x in range(1, 74):
         data = await PriceTool.fetch(f'https://mlb23.theshow.com/apis/listings.json?type=mlb_card&page={x}&series_id=1337')
         for y in range(25):
             try:
-                player_uuids[f"{data['listings'][y]['listing_name']}".lower()] = f"{data['listings'][y]['item']['uuid']}"
+                player_name = capwords(f"{data['listings'][y]['listing_name']}")
+                player_uuids[f"{player_name}"] = f"{data['listings'][y]['item']['uuid']}"
             except:
                 break
     await PriceTool.close()
@@ -111,7 +125,7 @@ def get_stats(mlb, gameID, player, playerID, position):
     return None
 
 @bot.command() # Bot command to create a buy alert for a player
-#@commands.has_role('Admins')
+@commands.has_role('Admins')
 async def buy(ctx, *name):
     if ctx.channel.id == 1109551093081448508 or ctx.channel.id == 1107033145846534245: # Channel to send commands in
         player = capwords(' '.join(name[:-1]))
@@ -120,8 +134,7 @@ async def buy(ctx, *name):
         elif player not in players:
             player_name = await get_player(mlb, player)
             if player_name: # Check if name matches player in database
-                players.append(player)
-                player_prices.add(player.lower())
+                players.add(player)
                 player_attributes[f'{player}'] = {
                     'Position': None,
                     'Type': 'Buy',
@@ -166,8 +179,8 @@ async def remove(ctx, *msg):
         player = capwords(' '.join(msg))
         if player in players:
             players.remove(player)
-            player_prices.remove(player.lower())
             player_attributes.pop(player)
+            await client.players.players.delete_one({'Name': f'{player}'})
             await ctx.send('Success: player removed')
         else:
             await ctx.send('Error: player not found')
@@ -179,8 +192,35 @@ async def list(ctx, *args):
         if len(players) == 0:
             await ctx.send('Error: list is empty')
         else:
-            alert_list = [f"[{player_attributes[f'{capwords(player)}']['Type']}] {capwords(player)} [{player_attributes[capwords(player)]['Price']}]" for player in player_prices]
+            alert_list = [f"[{player_attributes[f'{player}']['Type']}] {player} [{player_attributes[player]['Price']}]" for player in players]
             await ctx.send(', '.join(alert_list))
+
+@bot.command() # Bot command to shutdown and save
+@commands.has_role('Admins')
+async def shutdown(ctx, *args):
+    if ctx.channel.id == 1103511198474960916:
+        player_db = client.players
+        player_collection = player_db.players
+        docs = []
+        for player in players:
+            doc = await player_collection.find_one({'Name': player})
+            if doc:
+                updates = {'$set': {'Attributes': player_attributes[f'{player}']}}
+                player_collection.update_one({'Name': player}, updates)
+            else:
+                player_attributes[f'{player}']['Game ID'] = None
+                player_attributes[f'{player}']['Win PCT'] = None
+                player_attributes[f'{player}']['In Progress'] = True
+                player_attributes[f'{player}']['Message'] = None
+                doc = {
+                    'Name': player,
+                    'Attributes': player_attributes[f'{player}']
+                }
+                docs.append(doc)
+        if len(docs) != 0:
+            await player_collection.insert_many(docs)
+        await ctx.send('Shutting Down...')
+        await bot.close()
 
 @tasks.loop(seconds=120)
 async def update(channel):
@@ -192,16 +232,18 @@ async def update(channel):
         current_date = date.today()
         date_changed = True
     for player in players:
-        asyncio.sleep(30)
+        await asyncio.sleep(30)
         if date_changed:
             player_attributes[f'{player}']['Game ID'] = None
             player_attributes[f'{player}']['Win PCT'] = None
             player_attributes[f'{player}']['In Progress'] = True
+            player_attributes[f'{player}']['Message'] = None
         player_id = player_attributes[f'{player}']['Player ID']
         position = player_attributes[f'{player}']['Position']
         gameID = player_attributes[f'{player}']['Game ID']
         stored_win_percent = player_attributes[f'{player}']['Win PCT']
         message = player_attributes[f'{player}']['Message']
+        invalidStats = False
         if player_attributes[f'{player}']['In Progress'] == True:
             for game in schedule:
                 if gameID:
@@ -214,6 +256,8 @@ async def update(channel):
                     status = await get_status(mlb, player, player_id, game.gamepk)
                 if player_stats:
                     player_attributes[f'{player}']['In Progress'] = True
+                    if player_stats == '0-0' or player_stats == '0.0 IP, 0 ER, 0 K, 0 BB':
+                        invalidStats = True
                     if status and position == 'pitching':
                         summary = f'{player}: {player_stats} (Currently {position.capitalize()})'
                     elif position == 'pitching':
@@ -223,7 +267,7 @@ async def update(channel):
                     print(stored_win_percent, actual_win_percent)
                     if stored_win_percent == None:
                         stored_win_percent = actual_win_percent
-                    if stored_win_percent != actual_win_percent and player_stats != '0-0':
+                    if stored_win_percent != actual_win_percent and invalidStats == False:
                         summary = f'FINAL: {player} {player_stats}'
                         player_attributes[f'{player}']['In Progress'] = False
                         player_attributes[f'{player}']['Old Summary'] = summary
@@ -232,7 +276,7 @@ async def update(channel):
                             player_attributes[f'{player}']['Message'] = await channel.send(summary)
                         else:
                             player_attributes[f'{player}']['Message'] = await channel.send(summary)
-                    elif player_attributes[f'{player}']['Old Summary'] != summary:
+                    elif player_attributes[f'{player}']['Old Summary'] != summary and invalidStats == False:
                         player_attributes[f'{player}']['Old Summary'] = summary
                         if message:
                             await message.delete()
@@ -241,33 +285,31 @@ async def update(channel):
                             player_attributes[f'{player}']['Message'] = await channel.send(summary)
                     break
 
-@tasks.loop(minutes=60)
+@tasks.loop(seconds=60)
 async def update_prices(channel):
     PriceTool = TheShowPrices()
-    for player in player_prices:
-        player_upper = capwords(player)
+    for player in players:
         uuid = player_uuids[f'{player}']
-        alert_type = player_attributes[f'{player_upper}']['Type']
+        alert_type = player_attributes[f'{player}']['Type']
         data = await PriceTool.fetch(f'https://mlb23.theshow.com/apis/listing.json?uuid={uuid}')
         if alert_type == 'Buy':
             current_price = data['best_buy_price']
-            desired_price = player_attributes[f'{player_upper}']['Price']
+            desired_price = player_attributes[f'{player}']['Price']
             if current_price <= desired_price:
-                if player_attributes[f'{player_upper}']['Allow Alerts']:
-                    await channel.send(f'BUY ALERT: {player_upper} is under {desired_price} stubs!')
-                    player_attributes[f'{player_upper}']['Allow Alerts'] = False
+                if player_attributes[f'{player}']['Allow Alerts']:
+                    await channel.send(f'BUY ALERT: {player} is under {desired_price} stubs!')
+                    player_attributes[f'{player}']['Allow Alerts'] = False
             elif current_price > desired_price:
-                player_attributes[f'{player_upper}']['Allow Alerts'] = True
+                player_attributes[f'{player}']['Allow Alerts'] = True
         elif alert_type == 'Sell':
             current_price = data['best_sell_price']
-            desired_price = player_attributes[f'{player_upper}']['Price']
-            print(current_price, desired_price)
+            desired_price = player_attributes[f'{player}']['Price']
             if current_price >= desired_price:
-                if player_attributes[f'{player_upper}']['Allow Alerts']:
-                    await channel.send(f'SELL ALERT: {player_upper} is over {desired_price} stubs!')
-                    player_attributes[f'{player_upper}']['Allow Alerts'] = False
+                if player_attributes[f'{player}']['Allow Alerts']:
+                    await channel.send(f'SELL ALERT: {player} is over {desired_price} stubs!')
+                    player_attributes[f'{player}']['Allow Alerts'] = False
             elif current_price < desired_price:
-                player_attributes[f'{player_upper}']['Allow Alerts'] = True
+                player_attributes[f'{player}']['Allow Alerts'] = True
     await PriceTool.close()
 
 
@@ -286,5 +328,6 @@ async def setup_hook():
     schedule = await get_schedule(mlb)
     PriceTool = TheShowPrices()
     await main(PriceTool)
+    await loadData()
 
 bot.run(TOKEN)

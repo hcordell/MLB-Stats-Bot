@@ -192,6 +192,7 @@ async def update(channel):
         current_date = date.today()
         date_changed = True
     for player in players:
+        asyncio.sleep(30)
         if date_changed:
             player_attributes[f'{player}']['Game ID'] = None
             player_attributes[f'{player}']['Win PCT'] = None

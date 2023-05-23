@@ -100,12 +100,10 @@ def get_status(mlb, player, playerID, gameID):
 def get_stats(mlb, gameID, player, playerID, position):
     try:
         summary = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]["summary"]
-    except Exception as e0:
-        print(e0)
+    except:
         try:
             summary = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]["summary"]
-        except Exception as e:
-            print(e)
+        except:
             return None
     if summary:
         player_attributes[f'{player}']['Game ID'] = gameID
@@ -184,7 +182,7 @@ async def list(ctx, *args):
             alert_list = [f"[{player_attributes[f'{capwords(player)}']['Type']}] {capwords(player)} [{player_attributes[capwords(player)]['Price']}]" for player in player_prices]
             await ctx.send(', '.join(alert_list))
 
-@tasks.loop(seconds=150)
+@tasks.loop(seconds=120)
 async def update(channel):
     global current_date
     global schedule

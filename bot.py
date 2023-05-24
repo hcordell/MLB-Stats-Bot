@@ -197,9 +197,8 @@ async def list(ctx, *args):
             await ctx.send(', '.join(alert_list))
 
 @bot.command() # Bot command to shutdown and save
-@commands.has_role('Admins')
 async def shutdown(ctx, *args):
-    if ctx.channel.id == 1103511198474960916:
+    if ctx.channel.id == 1107033145846534245:
         player_db = client.players
         player_collection = player_db.players
         docs = []

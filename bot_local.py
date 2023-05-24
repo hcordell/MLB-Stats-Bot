@@ -119,6 +119,7 @@ def get_stats(mlb, gameID, player, playerID, position):
         try:
             summary = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]["summary"]
         except:
+            print('Error: wrong game or violation')
             return None
     if summary:
         player_attributes[f'{player}']['Game ID'] = gameID
@@ -233,7 +234,7 @@ async def update(channel):
         current_date = date.today()
         date_changed = True
     for player in players:
-        await asyncio.sleep(30)
+        await asyncio.sleep(60)
         if date_changed:
             player_attributes[f'{player}']['Game ID'] = None
             player_attributes[f'{player}']['Win PCT'] = None
@@ -248,9 +249,13 @@ async def update(channel):
         if player_attributes[f'{player}']['In Progress'] == True:
             for game in schedule:
                 if gameID:
-                    player_stats = await get_stats(mlb, gameID, player, player_id, position)
-                    actual_win_percent = await get_winpct(mlb, player, gameID)
-                    status = await get_status(mlb, player, player_id, gameID)
+                    while True:
+                        await asyncio.sleep(30)
+                        player_stats = await get_stats(mlb, gameID, player, player_id, position)
+                        actual_win_percent = await get_winpct(mlb, player, gameID)
+                        status = await get_status(mlb, player, player_id, gameID)
+                        if player_stats:
+                            break
                 else:
                     player_stats = await get_stats(mlb, game.gamepk, player, player_id, position)
                     actual_win_percent = await get_winpct(mlb, player, game.gamepk)

@@ -119,6 +119,7 @@ def get_stats(mlb, gameID, player, playerID, position):
         try:
             summary = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]["summary"]
         except:
+            print('Error: wrong game or violation')
             return None
     if summary:
         player_attributes[f'{player}']['Game ID'] = gameID
@@ -128,7 +129,7 @@ def get_stats(mlb, gameID, player, playerID, position):
 @bot.command() # Bot command to create a buy alert for a player
 @commands.has_role('Admins')
 async def buy(ctx, *name):
-    if ctx.channel.id == 1109551093081448508 or ctx.channel.id == 1107033145846534245: # Channel to send commands in
+    if ctx.channel.id == 1109551093081448508: # Channel to send commands in
         player = capwords(' '.join(name[:-1]))
         if name[-1].isnumeric == False:
             await ctx.send('Error: price not specified')
@@ -187,9 +188,8 @@ async def remove(ctx, *msg):
             await ctx.send('Error: player not found')
 
 @bot.command() # Bot command to print player list
-#@commands.has_role('Admins')
 async def list(ctx, *args):
-    if ctx.channel.id == 1109551093081448508 or ctx.channel.id == 1107033145846534245: # Channel to send commands in
+    if ctx.channel.id == 1109551093081448508: # Channel to send commands in
         if len(players) == 0:
             await ctx.send('Error: list is empty')
         else:
@@ -232,7 +232,7 @@ async def update(channel):
         current_date = date.today()
         date_changed = True
     for player in players:
-        await asyncio.sleep(30)
+        await asyncio.sleep(60)
         if date_changed:
             player_attributes[f'{player}']['Game ID'] = None
             player_attributes[f'{player}']['Win PCT'] = None
@@ -247,9 +247,13 @@ async def update(channel):
         if player_attributes[f'{player}']['In Progress'] == True:
             for game in schedule:
                 if gameID:
-                    player_stats = await get_stats(mlb, gameID, player, player_id, position)
-                    actual_win_percent = await get_winpct(mlb, player, gameID)
-                    status = await get_status(mlb, player, player_id, gameID)
+                    while True:
+                        await asyncio.sleep(30)
+                        player_stats = await get_stats(mlb, gameID, player, player_id, position)
+                        actual_win_percent = await get_winpct(mlb, player, gameID)
+                        status = await get_status(mlb, player, player_id, gameID)
+                        if player_stats:
+                            break
                 else:
                     player_stats = await get_stats(mlb, game.gamepk, player, player_id, position)
                     actual_win_percent = await get_winpct(mlb, player, game.gamepk)

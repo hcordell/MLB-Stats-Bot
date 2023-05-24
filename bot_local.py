@@ -18,8 +18,8 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 PASSWORD = os.getenv('PASSWORD')
 
-url = f"mongodb+srv://Chimaezss:{PASSWORD}@mlbstatsbotdb.wcpwbzb.mongodb.net/?retryWrites=true&w=majority&tls=true"
-client = AsyncIOMotorClient(url, server_api=ServerApi('1'), tlsCAFile=certifi.where())
+uri = f"mongodb+srv://Chimaezss:{PASSWORD}@mlbstatsbotdb.wcpwbzb.mongodb.net/?retryWrites=true&w=majority&tls=true"
+client = AsyncIOMotorClient(uri, server_api=ServerApi('1'), tlsCAFile=certifi.where())
 
 intents = discord.Intents.default() # Set parameters for discord bot
 intents.message_content = True
@@ -188,7 +188,6 @@ async def remove(ctx, *msg):
             await ctx.send('Error: player not found')
 
 @bot.command() # Bot command to print player list
-@commands.has_role('Admins')
 async def list(ctx, *args):
     if ctx.channel.id == 1103511198474960916: # Channel to send commands in
         if len(players) == 0:
@@ -198,7 +197,6 @@ async def list(ctx, *args):
             await ctx.send(', '.join(alert_list))
 
 @bot.command() # Bot command to shutdown and save
-@commands.has_role('Admins')
 async def shutdown(ctx, *args):
     if ctx.channel.id == 1103511198474960916:
         player_db = client.players

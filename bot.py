@@ -289,7 +289,7 @@ async def update(channel):
                             player_attributes[f'{player}']['Message'] = await channel.send(summary)
                     break
 
-@tasks.loop(seconds=60)
+@tasks.loop(minutes=30)
 async def update_prices(channel):
     PriceTool = TheShowPrices()
     for player in players:

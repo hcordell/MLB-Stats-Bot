@@ -7,7 +7,7 @@ import asyncio
 import aiohttp
 import typing
 import certifi
-from datetime import date
+from datetime import date, datetime
 from dotenv import load_dotenv
 from string import capwords
 from discord.ext import commands, tasks
@@ -227,6 +227,7 @@ async def update(channel):
     global current_date
     global schedule
     date_changed = False
+    print(datetime.now().hour)
     if current_date != date.today():
         schedule = await get_schedule(mlb)
         current_date = date.today()

@@ -231,7 +231,7 @@ async def update(channel):
         schedule = await get_schedule(mlb)
         current_date = date.today()
         date_changed = True
-        await asyncio.sleep(39600)
+        await asyncio.sleep(28800)
     for player in players:
         await asyncio.sleep(60)
         if date_changed:

@@ -233,7 +233,7 @@ async def update(channel):
         date_changed = True
         await asyncio.sleep(28800)
     for player in players:
-        await asyncio.sleep(60)
+        await asyncio.sleep(30)
         if date_changed:
             player_attributes[f'{player}']['Game ID'] = None
             player_attributes[f'{player}']['Win PCT'] = None
@@ -248,16 +248,16 @@ async def update(channel):
         if player_attributes[f'{player}']['In Progress'] == True:
             for game in schedule:
                 if gameID:
-                    while True:
-                        await asyncio.sleep(30)
-                        player_stats = await get_stats(mlb, gameID, player, player_id, position)
-                        actual_win_percent = await get_winpct(mlb, player, gameID)
-                        status = await get_status(mlb, player, player_id, gameID)
-                        if player_stats:
-                            break
+                    player_stats = await get_stats(mlb, gameID, player, player_id, position)
+                    await asyncio.sleep(10)
+                    actual_win_percent = await get_winpct(mlb, player, gameID)
+                    await asyncio.sleep(10)
+                    status = await get_status(mlb, player, player_id, gameID)
                 else:
                     player_stats = await get_stats(mlb, game.gamepk, player, player_id, position)
+                    await asyncio.sleep(10)
                     actual_win_percent = await get_winpct(mlb, player, game.gamepk)
+                    await asyncio.sleep(10)
                     status = await get_status(mlb, player, player_id, game.gamepk)
                 if player_stats:
                     player_attributes[f'{player}']['In Progress'] = True

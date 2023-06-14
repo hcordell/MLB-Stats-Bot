@@ -7,7 +7,7 @@ import asyncio
 import aiohttp
 import typing
 import certifi
-from datetime import date, datetime
+from datetime import date
 from dotenv import load_dotenv
 from string import capwords
 from discord.ext import commands, tasks
@@ -196,6 +196,18 @@ async def list(ctx, *args):
             alert_list = [f"[{player_attributes[f'{player}']['Type']}] {player} [{player_attributes[player]['Price']}]" for player in players]
             await ctx.send(', '.join(alert_list))
 
+@bot.command() # Bot command to message player prices
+async def prices(ctx, *args):
+    if isinstance(ctx.channel, discord.channel.DMChannel):
+        user_id = ctx.author.id
+        user = await bot.fetch_user(user_id)
+        price_list = []
+        for player in players:
+            alert_type = player_attributes[f'{player}']['Type']
+            price = player_attributes[f'{player}']['Price']
+            price_list.append(f'[{alert_type}] {player}: {price}')
+        await user.send('\n'.join(price_list))
+
 @bot.command() # Bot command to shutdown and save
 async def shutdown(ctx, *args):
     if ctx.channel.id == 1103511198474960916:
@@ -227,11 +239,11 @@ async def update(channel):
     global current_date
     global schedule
     date_changed = False
-    print(datetime.now().hour)
     if current_date != date.today():
         schedule = await get_schedule(mlb)
         current_date = date.today()
         date_changed = True
+        await asyncio.sleep(28800)
     for player in players:
         await asyncio.sleep(60)
         if date_changed:
@@ -248,16 +260,16 @@ async def update(channel):
         if player_attributes[f'{player}']['In Progress'] == True:
             for game in schedule:
                 if gameID:
-                    while True:
-                        await asyncio.sleep(30)
-                        player_stats = await get_stats(mlb, gameID, player, player_id, position)
-                        actual_win_percent = await get_winpct(mlb, player, gameID)
-                        status = await get_status(mlb, player, player_id, gameID)
-                        if player_stats:
-                            break
+                    player_stats = await get_stats(mlb, gameID, player, player_id, position)
+                    await asyncio.sleep(10)
+                    actual_win_percent = await get_winpct(mlb, player, gameID)
+                    await asyncio.sleep(10)
+                    status = await get_status(mlb, player, player_id, gameID)
                 else:
                     player_stats = await get_stats(mlb, game.gamepk, player, player_id, position)
+                    await asyncio.sleep(10)
                     actual_win_percent = await get_winpct(mlb, player, game.gamepk)
+                    await asyncio.sleep(10)
                     status = await get_status(mlb, player, player_id, game.gamepk)
                 if player_stats:
                     player_attributes[f'{player}']['In Progress'] = True

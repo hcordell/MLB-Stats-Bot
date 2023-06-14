@@ -196,6 +196,18 @@ async def list(ctx, *args):
             alert_list = [f"[{player_attributes[f'{player}']['Type']}] {player} [{player_attributes[player]['Price']}]" for player in players]
             await ctx.send(', '.join(alert_list))
 
+@bot.command() # Bot command to message player prices
+async def prices(ctx, *args):
+    if isinstance(ctx.channel, discord.channel.DMChannel):
+        user_id = ctx.author.id
+        user = await bot.fetch_user(user_id)
+        price_list = []
+        for player in players:
+            alert_type = player_attributes[f'{player}']['Type']
+            price = player_attributes[f'{player}']['Price']
+            price_list.append(f'[{alert_type}] {player}: {price}')
+        await user.send('\n'.join(price_list))
+
 @bot.command() # Bot command to shutdown and save
 async def shutdown(ctx, *args):
     if ctx.channel.id == 1107033145846534245:

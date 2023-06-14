@@ -93,15 +93,11 @@ def get_winpct(mlb, player, gameID):
 
 @unblock
 def get_status(mlb, player, playerID, gameID):
-    if player_attributes[f'{player}']['Position'] == 'batting':
-        try:
-            status = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].gamestatus.iscurrentbatter
-        except:
-            try:
-                status = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].gamestatus.iscurrentbatter
-            except:
-                status = None
-    elif player_attributes[f'{player}']['Position'] == 'pitching':
+    if player_attributes[f'{player}']['Team'] == 'Home':
+        status = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].gamestatus.iscurrentpitcher
+    elif player_attributes[f'{player}']['Team'] == 'Away':
+        status = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].gamestatus.iscurrentpitcher
+    else:
         try:
             status = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].gamestatus.iscurrentpitcher
         except:
@@ -113,14 +109,22 @@ def get_status(mlb, player, playerID, gameID):
 
 @unblock
 def get_stats(mlb, gameID, player, playerID, position):
-    try:
+    if player_attributes[f'{player}']['Team'] == 'Home':
         summary = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]["summary"]
-    except:
+    elif player_attributes[f'{player}']['Team'] == 'Away':
+        summary = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]["summary"]
+    else:
         try:
-            summary = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]["summary"]
+            summary = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]["summary"]
+            player_attributes[f'{player}']['Team'] = 'Home'
         except:
-            print('Error: wrong game or violation')
-            return None
+            try:
+                summary = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]["summary"]
+                player_attributes[f'{player}']['Team'] = 'Away'
+            except:
+                print(f'Error: wrong game or violation ({player})')
+                player_attributes[f'{player}']['Team'] = 'Unknown'
+                return None
     if summary:
         player_attributes[f'{player}']['Game ID'] = gameID
         return summary
@@ -136,10 +140,13 @@ async def buy(ctx, *name):
         elif player not in players:
             player_name = await get_player(mlb, player)
             if player_name: # Check if name matches player in database
+                if update.is_running():
+                    update.cancel()
                 players.add(player)
                 player_attributes[f'{player}'] = {
                     'Position': None,
                     'Type': 'Buy',
+                    'Team': 'Unknown',
                     'Price': int(name[-1]),
                     'Allow Alerts': True,
                     'Player ID': player_name[0],
@@ -155,6 +162,8 @@ async def buy(ctx, *name):
                 else:
                     player_attributes[f'{player}']['Position'] = 'batting'
                 await ctx.send('Success: player found')
+                channel = bot.get_channel(1103827849007333447)
+                update.start(channel)
             else:
                 await ctx.send('Error: player not found')
         else:
@@ -224,6 +233,7 @@ async def shutdown(ctx, *args):
                 player_attributes[f'{player}']['Win PCT'] = None
                 player_attributes[f'{player}']['In Progress'] = True
                 player_attributes[f'{player}']['Message'] = None
+                player_attributes[f'{player}']['Team'] = None
                 doc = {
                     'Name': player,
                     'Attributes': player_attributes[f'{player}']
@@ -245,12 +255,13 @@ async def update(channel):
         date_changed = True
         await asyncio.sleep(28800)
     for player in players:
-        await asyncio.sleep(60)
+        await asyncio.sleep(30)
         if date_changed:
             player_attributes[f'{player}']['Game ID'] = None
             player_attributes[f'{player}']['Win PCT'] = None
             player_attributes[f'{player}']['In Progress'] = True
             player_attributes[f'{player}']['Message'] = None
+            player_attributes[f'{player}']['Team'] = None
         player_id = player_attributes[f'{player}']['Player ID']
         position = player_attributes[f'{player}']['Position']
         gameID = player_attributes[f'{player}']['Game ID']
@@ -263,14 +274,20 @@ async def update(channel):
                     player_stats = await get_stats(mlb, gameID, player, player_id, position)
                     await asyncio.sleep(10)
                     actual_win_percent = await get_winpct(mlb, player, gameID)
-                    await asyncio.sleep(10)
-                    status = await get_status(mlb, player, player_id, gameID)
+                    if player_attributes[f'{player}']['Position'] == 'pitching':
+                        await asyncio.sleep(10)
+                        status = await get_status(mlb, player, player_id, game.gamepk)
+                    else:
+                        status = None
                 else:
                     player_stats = await get_stats(mlb, game.gamepk, player, player_id, position)
                     await asyncio.sleep(10)
                     actual_win_percent = await get_winpct(mlb, player, game.gamepk)
-                    await asyncio.sleep(10)
-                    status = await get_status(mlb, player, player_id, game.gamepk)
+                    if player_attributes[f'{player}']['Position'] == 'pitching':
+                        await asyncio.sleep(10)
+                        status = await get_status(mlb, player, player_id, game.gamepk)
+                    else:
+                        status = None
                 if player_stats:
                     player_attributes[f'{player}']['In Progress'] = True
                     if player_stats == '0-0' or player_stats == '0.0 IP, 0 ER, 0 K, 0 BB':

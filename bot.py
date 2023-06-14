@@ -140,6 +140,8 @@ async def buy(ctx, *name):
         elif player not in players:
             player_name = await get_player(mlb, player)
             if player_name: # Check if name matches player in database
+                if update.is_running():
+                    update.cancel()
                 players.add(player)
                 player_attributes[f'{player}'] = {
                     'Position': None,
@@ -160,6 +162,8 @@ async def buy(ctx, *name):
                 else:
                     player_attributes[f'{player}']['Position'] = 'batting'
                 await ctx.send('Success: player found')
+                channel = bot.get_channel(996715384365396038)
+                update.start(channel)
             else:
                 await ctx.send('Error: player not found')
         else:
@@ -273,6 +277,8 @@ async def update(channel):
                     if player_attributes[f'{player}']['Position'] == 'pitching':
                         await asyncio.sleep(10)
                         status = await get_status(mlb, player, player_id, game.gamepk)
+                    else:
+                        status = None
                 else:
                     player_stats = await get_stats(mlb, game.gamepk, player, player_id, position)
                     await asyncio.sleep(10)
@@ -280,6 +286,8 @@ async def update(channel):
                     if player_attributes[f'{player}']['Position'] == 'pitching':
                         await asyncio.sleep(10)
                         status = await get_status(mlb, player, player_id, game.gamepk)
+                    else:
+                        status = None
                 if player_stats:
                     player_attributes[f'{player}']['In Progress'] = True
                     if player_stats == '0-0' or player_stats == '0.0 IP, 0 ER, 0 K, 0 BB':

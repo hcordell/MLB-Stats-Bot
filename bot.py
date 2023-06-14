@@ -123,7 +123,7 @@ def get_stats(mlb, gameID, player, playerID, position):
                 player_attributes[f'{player}']['Team'] = 'Away'
             except:
                 print(f'Error: wrong game or violation ({player})')
-                player_attributes[f'{player}']['Team'] = None
+                player_attributes[f'{player}']['Team'] = 'Unknown'
                 return None
     if summary:
         player_attributes[f'{player}']['Game ID'] = gameID
@@ -144,7 +144,7 @@ async def buy(ctx, *name):
                 player_attributes[f'{player}'] = {
                     'Position': None,
                     'Type': 'Buy',
-                    'Team': None,
+                    'Team': 'Unknown',
                     'Price': int(name[-1]),
                     'Allow Alerts': True,
                     'Player ID': player_name[0],

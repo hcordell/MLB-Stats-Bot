@@ -300,7 +300,7 @@ async def update(channel):
                         summary = f'{player}: {player_stats} (Not {position.capitalize()})'
                     else:
                         summary = f'{player}: {player_stats}'
-                    gameOver = await get_game_finish(mlb, gameID)
+                    gameOver = await get_game_finish(mlb, game.gamepk)
                     if gameOver:
                         summary = f'FINAL: {player} {player_stats}'
                         player_attributes[f'{player}']['In Progress'] = False

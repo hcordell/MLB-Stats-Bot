@@ -279,14 +279,14 @@ async def update(channel):
                 if gameID:
                     player_stats = await get_stats(mlb, gameID, player, player_id, position)
                     if player_attributes[f'{player}']['Position'] == 'pitching':
-                        #await asyncio.sleep(10)
+                        await asyncio.sleep(10)
                         status = await get_status(mlb, player, player_id, game.gamepk)
                     else:
                         status = None
                 else:
                     player_stats = await get_stats(mlb, game.gamepk, player, player_id, position)
                     if player_attributes[f'{player}']['Position'] == 'pitching':
-                        #await asyncio.sleep(10)
+                        await asyncio.sleep(10)
                         status = await get_status(mlb, player, player_id, game.gamepk)
                     else:
                         status = None
@@ -300,7 +300,10 @@ async def update(channel):
                         summary = f'{player}: {player_stats} (Not {position.capitalize()})'
                     else:
                         summary = f'{player}: {player_stats}'
-                    gameOver = await get_game_finish(mlb, game.gamepk)
+                    if gameID:
+                        gameOver = await get_game_finish(mlb, gameID)
+                    else:
+                        gameOver = await get_game_finish(mlb, game.gamepk)
                     if gameOver:
                         summary = f'FINAL: {player} {player_stats}'
                         player_attributes[f'{player}']['In Progress'] = False

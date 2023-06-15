@@ -87,16 +87,26 @@ def get_schedule(mlb):
     return schedule
 
 @unblock
-def get_winpct(mlb, player, gameID):
-    winpct = player_attributes[f'{player}']['Win PCT'] = mlb.get_game_box_score(gameID).teams.home.team.record.winningpercentage
-    return winpct
+def get_game_finish(mlb, gameID):
+    status = mlb.get_game(gameID)['metadata']['gameevents']
+    if 'game_finished' in status:
+        return True
+    return False
 
 @unblock
 def get_status(mlb, player, playerID, gameID):
     if player_attributes[f'{player}']['Team'] == 'Home':
-        status = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].gamestatus.iscurrentpitcher
+        try:
+            status = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].gamestatus.iscurrentpitcher
+        except:
+            status = None
+            player_attributes[f'{player}']['Team'] = 'Unknown'
     elif player_attributes[f'{player}']['Team'] == 'Away':
-        status = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].gamestatus.iscurrentpitcher
+        try:
+            status = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].gamestatus.iscurrentpitcher
+        except:
+            status = None
+            player_attributes[f'{player}']['Team'] = 'Unknown'
     else:
         try:
             status = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].gamestatus.iscurrentpitcher
@@ -152,7 +162,6 @@ async def buy(ctx, *name):
                     'Player ID': player_name[0],
                     'Old Summary': None,
                     'Game ID': None,
-                    'Win PCT': None,
                     'In Progress': True,
                     'Message': None
                 }
@@ -225,15 +234,14 @@ async def shutdown(ctx, *args):
         docs = []
         for player in players:
             doc = await player_collection.find_one({'Name': player})
+            player_attributes[f'{player}']['Game ID'] = None
+            player_attributes[f'{player}']['In Progress'] = True
+            player_attributes[f'{player}']['Message'] = None
+            player_attributes[f'{player}']['Team'] = None
             if doc:
                 updates = {'$set': {'Attributes': player_attributes[f'{player}']}}
                 player_collection.update_one({'Name': player}, updates)
             else:
-                player_attributes[f'{player}']['Game ID'] = None
-                player_attributes[f'{player}']['Win PCT'] = None
-                player_attributes[f'{player}']['In Progress'] = True
-                player_attributes[f'{player}']['Message'] = None
-                player_attributes[f'{player}']['Team'] = None
                 doc = {
                     'Name': player,
                     'Attributes': player_attributes[f'{player}']
@@ -258,33 +266,27 @@ async def update(channel):
         await asyncio.sleep(30)
         if date_changed:
             player_attributes[f'{player}']['Game ID'] = None
-            player_attributes[f'{player}']['Win PCT'] = None
             player_attributes[f'{player}']['In Progress'] = True
             player_attributes[f'{player}']['Message'] = None
             player_attributes[f'{player}']['Team'] = None
         player_id = player_attributes[f'{player}']['Player ID']
         position = player_attributes[f'{player}']['Position']
         gameID = player_attributes[f'{player}']['Game ID']
-        stored_win_percent = player_attributes[f'{player}']['Win PCT']
         message = player_attributes[f'{player}']['Message']
         invalidStats = False
         if player_attributes[f'{player}']['In Progress'] == True:
             for game in schedule:
                 if gameID:
                     player_stats = await get_stats(mlb, gameID, player, player_id, position)
-                    await asyncio.sleep(10)
-                    actual_win_percent = await get_winpct(mlb, player, gameID)
                     if player_attributes[f'{player}']['Position'] == 'pitching':
-                        await asyncio.sleep(10)
+                        #await asyncio.sleep(10)
                         status = await get_status(mlb, player, player_id, game.gamepk)
                     else:
                         status = None
                 else:
                     player_stats = await get_stats(mlb, game.gamepk, player, player_id, position)
-                    await asyncio.sleep(10)
-                    actual_win_percent = await get_winpct(mlb, player, game.gamepk)
                     if player_attributes[f'{player}']['Position'] == 'pitching':
-                        await asyncio.sleep(10)
+                        #await asyncio.sleep(10)
                         status = await get_status(mlb, player, player_id, game.gamepk)
                     else:
                         status = None
@@ -298,10 +300,8 @@ async def update(channel):
                         summary = f'{player}: {player_stats} (Not {position.capitalize()})'
                     else:
                         summary = f'{player}: {player_stats}'
-                    print(stored_win_percent, actual_win_percent)
-                    if stored_win_percent == None:
-                        stored_win_percent = actual_win_percent
-                    if stored_win_percent != actual_win_percent and invalidStats == False:
+                    gameOver = await get_game_finish(mlb, gameID)
+                    if gameOver:
                         summary = f'FINAL: {player} {player_stats}'
                         player_attributes[f'{player}']['In Progress'] = False
                         player_attributes[f'{player}']['Old Summary'] = summary

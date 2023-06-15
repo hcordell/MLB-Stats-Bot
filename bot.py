@@ -94,9 +94,17 @@ def get_winpct(mlb, player, gameID):
 @unblock
 def get_status(mlb, player, playerID, gameID):
     if player_attributes[f'{player}']['Team'] == 'Home':
-        status = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].gamestatus.iscurrentpitcher
+        try:
+            status = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].gamestatus.iscurrentpitcher
+        except:
+            status = None
+            player_attributes[f'{player}']['Team'] = 'Unknown'
     elif player_attributes[f'{player}']['Team'] == 'Away':
-        status = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].gamestatus.iscurrentpitcher
+        try:
+            status = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].gamestatus.iscurrentpitcher
+        except:
+            status = None
+            player_attributes[f'{player}']['Team'] = 'Unknown'
     else:
         try:
             status = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].gamestatus.iscurrentpitcher

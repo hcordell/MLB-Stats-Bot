@@ -252,6 +252,13 @@ async def shutdown(ctx, *args):
         await ctx.send('Shutting Down...')
         await bot.close()
 
+@bot.command() # Bot command to restart
+async def restart(ctx, *args):
+    if ctx.channel.id == 1103511198474960916:
+        os.startfile('bot_local.py')
+        await ctx.send('Now Restarting...')
+        await ctx.invoke(bot.get_command('shutdown'))
+
 @tasks.loop(seconds=60)
 async def update(channel):
     global current_date

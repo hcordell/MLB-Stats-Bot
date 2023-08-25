@@ -83,7 +83,7 @@ def get_position(mlb, player, player_attributes):
 
 @unblock
 def get_schedule(mlb):
-    schedule = mlb.get_scheduled_games_by_date(date.today())
+    schedule = mlb.get_scheduled_games_by_date(date=date.today())
     return schedule
 
 @unblock

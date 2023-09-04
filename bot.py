@@ -259,11 +259,11 @@ async def restart(ctx, *args):
         await ctx.send('Now Restarting...')
         await ctx.invoke(bot.get_command('shutdown'))
 
-@tasks.loop(hours=24)
+@tasks.loop(hours=1)
 async def restart_loop(channel):
     now = datetime.now()
-    current_time = now.strftime("%H:%M")
-    if current_time == '03:00':
+    current_time = now.strftime("%H")
+    if current_time == '03':
         os.startfile('bot.py')
         command = bot.get_command('shutdown')
         await command(ctx)

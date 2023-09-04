@@ -7,7 +7,7 @@ import asyncio
 import aiohttp
 import typing
 import certifi
-from datetime import date
+from datetime import datetime, date
 from dotenv import load_dotenv
 from string import capwords
 from discord.ext import commands, tasks
@@ -227,30 +227,30 @@ async def prices(ctx, *args):
         await user.send('\n'.join(price_list))
 
 @bot.command() # Bot command to shutdown and save
+@commands.has_role('Admins')
 async def shutdown(ctx, *args):
-    if ctx.channel.id == 1103511198474960916:
-        player_db = client.players
-        player_collection = player_db.players
-        docs = []
-        for player in players:
-            doc = await player_collection.find_one({'Name': player})
-            player_attributes[f'{player}']['Game ID'] = None
-            player_attributes[f'{player}']['In Progress'] = True
-            player_attributes[f'{player}']['Message'] = None
-            player_attributes[f'{player}']['Team'] = None
-            if doc:
-                updates = {'$set': {'Attributes': player_attributes[f'{player}']}}
-                player_collection.update_one({'Name': player}, updates)
-            else:
-                doc = {
-                    'Name': player,
-                    'Attributes': player_attributes[f'{player}']
-                }
-                docs.append(doc)
-        if len(docs) != 0:
-            await player_collection.insert_many(docs)
-        await ctx.send('Shutting Down...')
-        await bot.close()
+    player_db = client.players
+    player_collection = player_db.players
+    docs = []
+    for player in players:
+        doc = await player_collection.find_one({'Name': player})
+        player_attributes[f'{player}']['Game ID'] = None
+        player_attributes[f'{player}']['In Progress'] = True
+        player_attributes[f'{player}']['Message'] = None
+        player_attributes[f'{player}']['Team'] = None
+        if doc:
+            updates = {'$set': {'Attributes': player_attributes[f'{player}']}}
+            player_collection.update_one({'Name': player}, updates)
+        else:
+            doc = {
+                'Name': player,
+                'Attributes': player_attributes[f'{player}']
+            }
+            docs.append(doc)
+    if len(docs) != 0:
+        await player_collection.insert_many(docs)
+    await ctx.send('Shutting Down...')
+    await bot.close()
 
 @bot.command() # Bot command to restart
 async def restart(ctx, *args):
@@ -261,9 +261,12 @@ async def restart(ctx, *args):
 
 @tasks.loop(hours=24)
 async def restart_loop(channel):
-    os.startfile('bot.py')
-    await ctx.invoke(bot.get_command('restart'))
-    await ctx.invoke(bot.get_command('shutdown'))
+    now = datetime.now()
+    current_time = now.strftime("%H:%M")
+    if current_time == '03:00':
+        os.startfile('bot.py')
+        command = bot.get_command('shutdown')
+        await command(ctx)
 
 @tasks.loop(minutes=5)
 async def update(channel):

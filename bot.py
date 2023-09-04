@@ -228,7 +228,7 @@ async def prices(ctx, *args):
 
 @bot.command() # Bot command to shutdown and save
 async def shutdown(ctx, *args):
-    if ctx.channel.id == 1107033145846534245:
+    if ctx.channel.id == 1103511198474960916:
         player_db = client.players
         player_collection = player_db.players
         docs = []
@@ -254,7 +254,7 @@ async def shutdown(ctx, *args):
 
 @bot.command() # Bot command to restart
 async def restart(ctx, *args):
-    if ctx.channel.id == 1107033145846534245:
+    if ctx.channel.id == 1103511198474960916:
         os.startfile('bot.py')
         await ctx.send('Now Restarting...')
         await ctx.invoke(bot.get_command('shutdown'))

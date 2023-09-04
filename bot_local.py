@@ -372,6 +372,6 @@ async def setup_hook():
     schedule = await get_schedule(mlb)
     PriceTool = TheShowPrices()
     await main(PriceTool)
-    await loadData()
+    #await loadData()
 
 bot.run(TOKEN)

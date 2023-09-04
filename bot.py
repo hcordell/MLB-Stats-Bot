@@ -83,7 +83,7 @@ def get_position(mlb, player, player_attributes):
 
 @unblock
 def get_schedule(mlb):
-    schedule = mlb.get_scheduled_games_by_date(date=date.today())
+    schedule = mlb.get_scheduled_games_by_date(date.today())
     return schedule
 
 @unblock
@@ -259,6 +259,12 @@ async def restart(ctx, *args):
         await ctx.send('Now Restarting...')
         await ctx.invoke(bot.get_command('shutdown'))
 
+@tasks.loop(hours=24)
+async def restart_loop(channel):
+    os.startfile('bot.py')
+    await ctx.invoke(bot.get_command('restart'))
+    await ctx.invoke(bot.get_command('shutdown'))
+
 @tasks.loop(minutes=5)
 async def update(channel):
     global current_date
@@ -362,6 +368,7 @@ async def on_ready():
     channel = bot.get_channel(996715384365396038) # Channel to send updates in
     price_alerts = bot.get_channel(1107027549382516766) # Channel to send price updates in
     update.start(channel)
+    restart_loop.start(channel)
     update_prices.start(price_alerts)
 
 @bot.event

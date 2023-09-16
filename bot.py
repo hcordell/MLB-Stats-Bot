@@ -264,9 +264,28 @@ async def restart_loop(channel):
     now = datetime.now()
     current_time = now.strftime("%H:%M")
     if current_time == '03:00':
+        player_db = client.players
+        player_collection = player_db.players
+        docs = []
+        for player in players:
+            doc = await player_collection.find_one({'Name': player})
+            player_attributes[f'{player}']['Game ID'] = None
+            player_attributes[f'{player}']['In Progress'] = True
+            player_attributes[f'{player}']['Message'] = None
+            player_attributes[f'{player}']['Team'] = None
+            if doc:
+                updates = {'$set': {'Attributes': player_attributes[f'{player}']}}
+                player_collection.update_one({'Name': player}, updates)
+            else:
+                doc = {
+                    'Name': player,
+                    'Attributes': player_attributes[f'{player}']
+                }
+                docs.append(doc)
+        if len(docs) != 0:
+            await player_collection.insert_many(docs)
         os.startfile('bot.py')
-        command = bot.get_command('shutdown')
-        await command(ctx)
+        await bot.close()
 
 @tasks.loop(minutes=5)
 async def update(channel):

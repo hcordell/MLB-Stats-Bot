@@ -53,7 +53,7 @@ async def loadData():
 
 async def main(PriceTool):
     for x in range(1, 74):
-        data = await PriceTool.fetch(f'https://mlb23.theshow.com/apis/listings.json?type=mlb_card&page={x}&series_id=1337')
+        data = await PriceTool.fetch(f'https://mlb24.theshow.com/apis/listings.json?type=mlb_card&page={x}&series_id=1337')
         for y in range(25):
             try:
                 player_name = capwords(f"{data['listings'][y]['listing_name']}")
@@ -363,7 +363,7 @@ async def update_prices(channel):
     for player in players:
         uuid = player_uuids[f'{player}']
         alert_type = player_attributes[f'{player}']['Type']
-        data = await PriceTool.fetch(f'https://mlb23.theshow.com/apis/listing.json?uuid={uuid}')
+        data = await PriceTool.fetch(f'https://mlb24.theshow.com/apis/listing.json?uuid={uuid}')
         if alert_type == 'Buy':
             current_price = data['best_buy_price']
             desired_price = player_attributes[f'{player}']['Price']

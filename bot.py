@@ -340,6 +340,8 @@ async def update(channel):
                     else:
                         gameOver = await get_game_finish(mlb, game.gamepk)
                     if gameOver:
+                        await asyncio.sleep(300)
+                        player_stats = await get_stats(mlb, gameID, player, player_id, position)
                         summary = f'FINAL: {player} {player_stats}'
                         player_attributes[f'{player}']['In Progress'] = False
                         player_attributes[f'{player}']['Old Summary'] = summary

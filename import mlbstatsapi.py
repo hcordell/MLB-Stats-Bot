@@ -1,29 +1,13 @@
-import aiohttp
-import asyncio
+import mlbstatsapi
+from datetime import datetime, date
 
-player_uuids = {}
+mlb = mlbstatsapi.Mlb()
+player = mlb.get_people_id("Tyler O'Neill")
+schedule = mlb.get_scheduled_games_by_date(date.today())
+status = mlb.get_game(746654)
+summary = mlb.get_game_box_score(746249).teams.away.players[f"id{641933}"].stats['batting']
 
-class TheShowPrices:
-    def __init__(self) -> None:
-        self.session = aiohttp.ClientSession()
+# Kenley Jansen GAME ID: 746249 PLAYER ID: 445276
+# Tyler O'Neill: GAME ID: 746249 PLAYER ID: 641933
 
-    async def fetch(self, url):
-        async with self.session.get(url) as response:
-            return await response.json()
-    
-    async def close(self):
-        await self.session.close()
-
-async def main():
-    PriceTool = TheShowPrices()
-    for x in range(1, 74):
-        data = await PriceTool.fetch(f'https://mlb23.theshow.com/apis/listings.json?type=mlb_card&page={x}&series_id=1337')
-        for y in range(25):
-            try:
-                player_uuids[f"{data['listings'][y]['listing_name']}"] = f"{data['listings'][y]['item']['uuid']}"
-            except:
-                break
-    await PriceTool.close()
-    print(player_uuids['Gerrit Cole'])
-
-asyncio.run(main())
+print(summary)

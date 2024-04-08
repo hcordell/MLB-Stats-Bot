@@ -137,6 +137,12 @@ def get_stats(mlb, gameID, player, playerID, position):
                 return None
     if summary:
         player_attributes[f'{player}']['Game ID'] = gameID
+        bsv = mlb.get_game_box_score(746249).teams.away.players[f"id{445276}"].stats['pitching']['blownsaves']
+        sv = mlb.get_game_box_score(746249).teams.away.players[f"id{445276}"].stats['pitching']['saves']
+        if bsv == 1:
+            summary += ', 1 BSV'
+        elif sv == 1:
+            summary += ', 1 SV'
         return summary
     return None
 
@@ -340,8 +346,6 @@ async def update(channel):
                     else:
                         gameOver = await get_game_finish(mlb, game.gamepk)
                     if gameOver:
-                        await asyncio.sleep(300)
-                        player_stats = await get_stats(mlb, gameID, player, player_id, position)
                         summary = f'FINAL: {player} {player_stats}'
                         player_attributes[f'{player}']['In Progress'] = False
                         player_attributes[f'{player}']['Old Summary'] = summary

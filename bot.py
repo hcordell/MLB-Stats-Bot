@@ -139,7 +139,7 @@ def get_stats(mlb, gameID, player, playerID, position):
         player_attributes[f'{player}']['Game ID'] = gameID
         bsv = mlb.get_game_box_score(746249).teams.away.players[f"id{445276}"].stats['pitching']['blownsaves']
         sv = mlb.get_game_box_score(746249).teams.away.players[f"id{445276}"].stats['pitching']['saves']
-        if position == 'pitching':
+        if position == 'pitching' and get_game_finish(mlb, gameID):
             if bsv == 1:
                 summary += ', 1 BSV'
             elif sv == 1:

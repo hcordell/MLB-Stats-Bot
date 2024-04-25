@@ -131,8 +131,9 @@ def get_stats(mlb, gameID, player, playerID, position):
             try:
                 summary = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]["summary"]
                 player_attributes[f'{player}']['Team'] = 'Away'
-            except:
+            except Exception as e:
                 print(f'Error: wrong game or violation ({player})')
+                print(f'{e}\n')
                 player_attributes[f'{player}']['Team'] = 'Unknown'
                 return None
     if summary:

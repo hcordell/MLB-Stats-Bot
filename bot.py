@@ -120,16 +120,28 @@ def get_status(mlb, player, playerID, gameID):
 @unblock
 def get_stats(mlb, gameID, player, playerID, position):
     if player_attributes[f'{player}']['Team'] == 'Home':
-        summary = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]["summary"]
+        game = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]
+        if game != None:
+            player_attributes[f'{player}']['Game ID'] = gameID
+        summary = game.stats[position]['summary']
     elif player_attributes[f'{player}']['Team'] == 'Away':
-        summary = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]["summary"]
+        game = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]
+        if game != None:
+            player_attributes[f'{player}']['Game ID'] = gameID
+        summary = game.stats[position]['summary']
     else:
         try:
-            summary = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]["summary"]
+            game = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]
+            if game != None:
+                player_attributes[f'{player}']['Game ID'] = gameID
+            summary = game.stats[position]['summary']
             player_attributes[f'{player}']['Team'] = 'Home'
         except:
             try:
-                summary = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]["summary"]
+                game = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]
+                if game != None:
+                    player_attributes[f'{player}']['Game ID'] = gameID
+                summary = game.stats[position]['summary']
                 player_attributes[f'{player}']['Team'] = 'Away'
             except Exception as e:
                 print(f'Error: wrong game or violation ({player})')

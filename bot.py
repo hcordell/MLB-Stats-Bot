@@ -270,10 +270,9 @@ async def shutdown(ctx, *args):
 
 @bot.command() # Bot command to restart
 async def restart(ctx, *args):
-    if ctx.channel.id == 1103511198474960916:
-        os.startfile('bot.py')
-        await ctx.send('Now Restarting...')
-        await ctx.invoke(bot.get_command('shutdown'))
+    os.startfile('bot.py')
+    await ctx.send('Now Restarting...')
+    await ctx.invoke(bot.get_command('shutdown'))
 
 @tasks.loop(minutes=1)
 async def restart_loop(channel):

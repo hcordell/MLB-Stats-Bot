@@ -144,7 +144,7 @@ def get_stats(mlb, gameID, player, playerID, position):
                 summary = game.stats[position]['summary']
                 player_attributes[f'{player}']['Team'] = 'Away'
             except Exception as e:
-                if e[0] == 'i':
+                if str(e)[0] == 'i':
                     player_attributes[f'{player}']['Game ID'] = gameID
                 print(f'Error: wrong game or violation ({player})')
                 print(f'{e}\n')

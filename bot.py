@@ -147,6 +147,7 @@ def get_stats(mlb, gameID, player, playerID, position):
                 if str(e)[0] == 'i':
                     player_attributes[f'{player}']['Game ID'] = gameID
                     player_attributes[f'{player}']['Start Time'] = mlb.get_game(gameID)['gamedata']['datetime']['time']
+                    player_attributes[f'{player}']['AM/PM'] = mlb.get_game(gameID)['gamedata']['datetime']['ampm']
                 print(f'Error: wrong game or violation ({player})')
                 print(f'{e}\n')
                 player_attributes[f'{player}']['Team'] = 'Unknown'
@@ -320,9 +321,12 @@ async def restart_loop(channel):
 
 @tasks.loop(minutes=5)
 async def update(channel):
+    print('Update in progress')
     global current_date
     global schedule
     date_changed = False
+    cur_time = int(datetime.now().strftime('%H')) % 12
+    cur_ampm = datetime.now().strftime('%p')
     if current_date != date.today():
         schedule = await get_schedule(mlb)
         current_date = date.today()
@@ -334,6 +338,7 @@ async def update(channel):
             player_attributes[f'{player}']['Game ID'] = None
             player_attributes[f'{player}']['In Progress'] = True
             player_attributes[f'{player}']['Start Time'] = '0:00'
+            player_attributes[f'{player}']['AM/PM'] = None
             player_attributes[f'{player}']['Message'] = None
             player_attributes[f'{player}']['Team'] = None
         player_id = player_attributes[f'{player}']['Player ID']
@@ -342,11 +347,15 @@ async def update(channel):
         message = player_attributes[f'{player}']['Message']
         invalidStats = False
         if player_attributes[f'{player}']['In Progress'] == True:
-            cur_time = int(datetime.now().strftime('%H')) % 12
             for game in schedule:
                 if 'Start Time' in player_attributes[f'{player}']:
-                    if player_attributes[f'{player}']['Start Time'][0] > cur_time:
+                    if cur_ampm == 'AM' and player_attributes[f'{player}']['AM/PM'] == 'PM':
                         break
+                    elif cur_ampm == player_attributes[f'{player}']['AM/PM']:
+                        if cur_ampm == 'PM' and cur_time == 0:
+                            cur_time += 1
+                        if player_attributes[f'{player}']['Start Time'][0] > cur_time:
+                            break
                 if gameID:
                     player_stats = await get_stats(mlb, gameID, player, player_id, position)
                     if player_attributes[f'{player}']['Position'] == 'pitching':

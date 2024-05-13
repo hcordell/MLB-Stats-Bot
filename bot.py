@@ -344,8 +344,9 @@ async def update(channel):
         if player_attributes[f'{player}']['In Progress'] == True:
             cur_time = int(datetime.now().strftime('%H')) % 12
             for game in schedule:
-                if player_attributes[f'{player}']['Start Time'][0] > cur_time:
-                    break
+                if player_attributes[f'{player}']['Start Time']:
+                    if player_attributes[f'{player}']['Start Time'][0] > cur_time:
+                        break
                 if gameID:
                     player_stats = await get_stats(mlb, gameID, player, player_id, position)
                     if player_attributes[f'{player}']['Position'] == 'pitching':

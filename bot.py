@@ -144,7 +144,8 @@ def get_stats(mlb, gameID, player, playerID, position):
                 summary = game.stats[position]['summary']
                 player_attributes[f'{player}']['Team'] = 'Away'
             except Exception as e:
-                if str(e)[0] == 'i':
+                print(str(e)[0])
+                if str(e)[1:3] != 'id':
                     player_attributes[f'{player}']['Game ID'] = gameID
                     player_attributes[f'{player}']['Start Time'] = mlb.get_game(gameID)['gamedata']['datetime']['time']
                     player_attributes[f'{player}']['AM/PM'] = mlb.get_game(gameID)['gamedata']['datetime']['ampm']

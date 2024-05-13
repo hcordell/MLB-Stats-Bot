@@ -12,6 +12,9 @@ if mlb.get_game_box_score(745755).teams.home.players['id624647'].stats['batting'
 summary = mlb.get_game_box_score(746404).teams.home.players[f"id{664299}"].stats['pitching']['blownsaves']
 # Kenley Jansen GAME ID: 746977 PLAYER ID: 445276
 # Tyler O'Neill: GAME ID: 746249 PLAYER ID: 641933
-
-string = '12:00'
+test = {}
+try:
+    testing = test['id82756752']
+except Exception as e:
+    print(str(e)[1:3])
 print(datetime.now().strftime('%p'))

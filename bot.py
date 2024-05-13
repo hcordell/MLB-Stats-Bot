@@ -355,7 +355,7 @@ async def update(channel):
                     elif cur_ampm == player_attributes[f'{player}']['AM/PM']:
                         if cur_ampm == 'PM' and cur_time == 0:
                             cur_time += 1
-                        if player_attributes[f'{player}']['Start Time'][0] > cur_time:
+                        if int(player_attributes[f'{player}']['Start Time'][0]) > cur_time:
                             break
                 if gameID:
                     player_stats = await get_stats(mlb, gameID, player, player_id, position)

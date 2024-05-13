@@ -146,6 +146,7 @@ def get_stats(mlb, gameID, player, playerID, position):
             except Exception as e:
                 if str(e)[0] == 'i':
                     player_attributes[f'{player}']['Game ID'] = gameID
+                    player_attributes[f'{player}']['Start Time'] = mlb.get_game(gameID)['gamedata']['datetime']['time']
                 print(f'Error: wrong game or violation ({player})')
                 print(f'{e}\n')
                 player_attributes[f'{player}']['Team'] = 'Unknown'
@@ -332,6 +333,7 @@ async def update(channel):
         if date_changed:
             player_attributes[f'{player}']['Game ID'] = None
             player_attributes[f'{player}']['In Progress'] = True
+            player_attributes[f'{player}']['Start Time'] = '0:00'
             player_attributes[f'{player}']['Message'] = None
             player_attributes[f'{player}']['Team'] = None
         player_id = player_attributes[f'{player}']['Player ID']
@@ -340,7 +342,10 @@ async def update(channel):
         message = player_attributes[f'{player}']['Message']
         invalidStats = False
         if player_attributes[f'{player}']['In Progress'] == True:
+            cur_time = int(datetime.now().strftime('%H')) % 12
             for game in schedule:
+                if player_attributes[f'{player}']['Start Time'][0] > cur_time:
+                    break
                 if gameID:
                     player_stats = await get_stats(mlb, gameID, player, player_id, position)
                     if player_attributes[f'{player}']['Position'] == 'pitching':

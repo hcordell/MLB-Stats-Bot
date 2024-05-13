@@ -344,7 +344,7 @@ async def update(channel):
         if player_attributes[f'{player}']['In Progress'] == True:
             cur_time = int(datetime.now().strftime('%H')) % 12
             for game in schedule:
-                if player_attributes[f'{player}']['Start Time']:
+                if 'Start Time' in player_attributes[f'{player}']:
                     if player_attributes[f'{player}']['Start Time'][0] > cur_time:
                         break
                 if gameID:

@@ -329,11 +329,13 @@ async def update(channel):
     cur_time = int(datetime.now().strftime('%H')) % 12
     cur_ampm = datetime.now().strftime('%p')
     if current_date != date.today():
+        print('Sleeping...')
         schedule = await get_schedule(mlb)
         current_date = date.today()
         date_changed = True
         await asyncio.sleep(28800)
     for player in players:
+        print(f'Updating {player}')
         await asyncio.sleep(30)
         if date_changed:
             player_attributes[f'{player}']['Game ID'] = None

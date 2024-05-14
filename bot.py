@@ -350,7 +350,7 @@ async def update(channel):
         if player_attributes[f'{player}']['In Progress'] == True:
             for game in schedule:
                 if 'Start Time' in player_attributes[f'{player}']:
-                    print(f'Player: {player}\nStart Time: {player_attributes[f'{player}']['Start Time']}')
+                    print(f'Player: {player}\nStart Time: {player_attributes[f"{player}"]["Start Time"]}')
                     if cur_ampm == 'AM' and player_attributes[f'{player}']['AM/PM'] == 'PM':
                         break
                     elif cur_ampm == player_attributes[f'{player}']['AM/PM']:

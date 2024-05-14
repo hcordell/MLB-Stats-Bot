@@ -177,7 +177,7 @@ def get_stats(mlb, gameID, player, playerID, position):
 @bot.command() # Bot command to create a buy alert for a player
 @commands.has_role('Admins')
 async def buy(ctx, *name):
-    if ctx.channel.id == 1109551093081448508: # Channel to send commands in
+    if ctx.channel.id == 1109551093081448508 or ctx.channel.id == 1103511198474960916: # Channel to send commands in
         player = capwords(' '.join(name[:-1]))
         if name[-1].isnumeric == False:
             await ctx.send('Error: price not specified')
@@ -270,6 +270,7 @@ async def shutdown(ctx, *args):
         doc = await player_collection.find_one({'Name': player})
         player_attributes[f'{player}']['Game ID'] = None
         player_attributes[f'{player}']['In Progress'] = True
+        player_attributes[f'{player}']['Start Time'] = None
         player_attributes[f'{player}']['Message'] = None
         player_attributes[f'{player}']['Team'] = None
         if doc:
@@ -450,6 +451,6 @@ async def setup_hook():
     schedule = await get_schedule(mlb)
     PriceTool = TheShowPrices()
     await main(PriceTool)
-    #await loadData()
+    await loadData()
 
 bot.run(TOKEN)

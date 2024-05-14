@@ -123,20 +123,20 @@ def get_stats(mlb, gameID, player, playerID, position):
         game = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]
         if game != None:
             player_attributes[f'{player}']['Game ID'] = gameID
-        summary = game.stats[position]['summary']
+        summary = game['summary']
         print(f'Success: {gameID}')
     elif player_attributes[f'{player}']['Team'] == 'Away':
         game = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]
         if game != None:
             player_attributes[f'{player}']['Game ID'] = gameID
-        summary = game.stats[position]['summary']
+        summary = game['summary']
         print(f'Success: {gameID}')
     else:
         try:
             game = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]
             if game != None:
                 player_attributes[f'{player}']['Game ID'] = gameID
-            summary = game.stats[position]['summary']
+            summary = game['summary']
             player_attributes[f'{player}']['Team'] = 'Home'
             print(f'Success: {gameID}')
         except:
@@ -144,17 +144,16 @@ def get_stats(mlb, gameID, player, playerID, position):
                 game = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]
                 if game != None:
                     player_attributes[f'{player}']['Game ID'] = gameID
-                summary = game.stats[position]['summary']
+                summary = game['summary']
                 player_attributes[f'{player}']['Team'] = 'Away'
                 print(f'Success: {gameID}')
             except Exception as e:
                 print(str(e)[0])
                 print(gameID)
                 if str(e)[1:3] != 'id':
-                    pass
-                    #player_attributes[f'{player}']['Game ID'] = gameID
-                    #player_attributes[f'{player}']['Start Time'] = mlb.get_game(gameID)['gamedata']['datetime']['time']
-                    #player_attributes[f'{player}']['AM/PM'] = mlb.get_game(gameID)['gamedata']['datetime']['ampm']
+                    player_attributes[f'{player}']['Game ID'] = gameID
+                    player_attributes[f'{player}']['Start Time'] = mlb.get_game(gameID)['gamedata']['datetime']['time']
+                    player_attributes[f'{player}']['AM/PM'] = mlb.get_game(gameID)['gamedata']['datetime']['ampm']
                 print(f'Error: wrong game or violation ({player})')
                 print(f'{e}\n')
                 player_attributes[f'{player}']['Team'] = 'Unknown'
@@ -275,6 +274,7 @@ async def shutdown(ctx, *args):
         doc = await player_collection.find_one({'Name': player})
         player_attributes[f'{player}']['Game ID'] = None
         player_attributes[f'{player}']['In Progress'] = True
+        player_attributes[f'{player}']['Start Time'] = None
         player_attributes[f'{player}']['Message'] = None
         player_attributes[f'{player}']['Team'] = None
         if doc:

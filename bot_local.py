@@ -7,7 +7,7 @@ import asyncio
 import aiohttp
 import typing
 import certifi
-from datetime import date
+from datetime import datetime, date
 from dotenv import load_dotenv
 from string import capwords
 from discord.ext import commands, tasks
@@ -53,7 +53,7 @@ async def loadData():
 
 async def main(PriceTool):
     for x in range(1, 74):
-        data = await PriceTool.fetch(f'https://mlb23.theshow.com/apis/listings.json?type=mlb_card&page={x}&series_id=1337')
+        data = await PriceTool.fetch(f'https://mlb24.theshow.com/apis/listings.json?type=mlb_card&page={x}&series_id=1337')
         for y in range(25):
             try:
                 player_name = capwords(f"{data['listings'][y]['listing_name']}")
@@ -120,23 +120,63 @@ def get_status(mlb, player, playerID, gameID):
 @unblock
 def get_stats(mlb, gameID, player, playerID, position):
     if player_attributes[f'{player}']['Team'] == 'Home':
-        summary = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]["summary"]
+        game = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]
+        if game != None:
+            player_attributes[f'{player}']['Game ID'] = gameID
+        summary = game.stats[position]['summary']
+        print(f'Success: {gameID}')
     elif player_attributes[f'{player}']['Team'] == 'Away':
-        summary = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]["summary"]
+        game = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]
+        if game != None:
+            player_attributes[f'{player}']['Game ID'] = gameID
+        summary = game.stats[position]['summary']
+        print(f'Success: {gameID}')
     else:
         try:
-            summary = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]["summary"]
+            game = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]
+            if game != None:
+                player_attributes[f'{player}']['Game ID'] = gameID
+            summary = game.stats[position]['summary']
             player_attributes[f'{player}']['Team'] = 'Home'
+            print(f'Success: {gameID}')
         except:
             try:
-                summary = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]["summary"]
+                game = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]
+                if game != None:
+                    player_attributes[f'{player}']['Game ID'] = gameID
+                summary = game.stats[position]['summary']
                 player_attributes[f'{player}']['Team'] = 'Away'
-            except:
+                print(f'Success: {gameID}')
+            except Exception as e:
+                print(str(e)[0])
+                print(gameID)
+                if str(e)[1:3] != 'id':
+                    pass
+                    #player_attributes[f'{player}']['Game ID'] = gameID
+                    #player_attributes[f'{player}']['Start Time'] = mlb.get_game(gameID)['gamedata']['datetime']['time']
+                    #player_attributes[f'{player}']['AM/PM'] = mlb.get_game(gameID)['gamedata']['datetime']['ampm']
                 print(f'Error: wrong game or violation ({player})')
+                print(f'{e}\n')
                 player_attributes[f'{player}']['Team'] = 'Unknown'
                 return None
     if summary:
         player_attributes[f'{player}']['Game ID'] = gameID
+        status = mlb.get_game(gameID)['metadata']['gameevents']
+        if 'game_finished' in status:
+            finished = True
+        else:
+            finished = False
+        if position == 'pitching' and finished:
+            try:
+                bsv = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats['pitching']['blownsaves']
+                sv = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats['pitching']['saves']
+            except:
+                bsv = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats['pitching']['blownsaves']
+                sv = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats['pitching']['saves']
+            if bsv == 1:
+                summary += ', 1 BSV'
+            elif sv == 1:
+                summary += ', 1 SV'
         return summary
     return None
 
@@ -228,7 +268,41 @@ async def prices(ctx, *args):
 
 @bot.command() # Bot command to shutdown and save
 async def shutdown(ctx, *args):
+    player_db = client.players
+    player_collection = player_db.players
+    docs = []
+    for player in players:
+        doc = await player_collection.find_one({'Name': player})
+        player_attributes[f'{player}']['Game ID'] = None
+        player_attributes[f'{player}']['In Progress'] = True
+        player_attributes[f'{player}']['Message'] = None
+        player_attributes[f'{player}']['Team'] = None
+        if doc:
+            updates = {'$set': {'Attributes': player_attributes[f'{player}']}}
+            player_collection.update_one({'Name': player}, updates)
+        else:
+            doc = {
+                'Name': player,
+                'Attributes': player_attributes[f'{player}']
+            }
+            docs.append(doc)
+    if len(docs) != 0:
+        await player_collection.insert_many(docs)
+    await ctx.send('Shutting Down...')
+    await bot.close()
+
+@bot.command() # Bot command to restart
+async def restart(ctx, *args):
     if ctx.channel.id == 1103511198474960916:
+        os.startfile('bot_local.py')
+        await ctx.send('Now Restarting...')
+        await ctx.invoke(bot.get_command('shutdown'))
+
+@tasks.loop(minutes=1)
+async def restart_loop(channel):
+    now = datetime.now()
+    current_time = now.strftime("%H:%M")
+    if current_time == '03:00':
         player_db = client.players
         player_collection = player_db.players
         docs = []
@@ -249,21 +323,17 @@ async def shutdown(ctx, *args):
                 docs.append(doc)
         if len(docs) != 0:
             await player_collection.insert_many(docs)
-        await ctx.send('Shutting Down...')
+        os.startfile('bot.py')
         await bot.close()
 
-@bot.command() # Bot command to restart
-async def restart(ctx, *args):
-    if ctx.channel.id == 1103511198474960916:
-        os.startfile('bot_local.py')
-        await ctx.send('Now Restarting...')
-        await ctx.invoke(bot.get_command('shutdown'))
-
-@tasks.loop(seconds=60)
+@tasks.loop(minutes=5)
 async def update(channel):
+    print('Update in progress')
     global current_date
     global schedule
     date_changed = False
+    cur_time = int(datetime.now().strftime('%H')) % 12
+    cur_ampm = datetime.now().strftime('%p')
     if current_date != date.today():
         schedule = await get_schedule(mlb)
         current_date = date.today()
@@ -274,6 +344,8 @@ async def update(channel):
         if date_changed:
             player_attributes[f'{player}']['Game ID'] = None
             player_attributes[f'{player}']['In Progress'] = True
+            player_attributes[f'{player}']['Start Time'] = '0:00'
+            player_attributes[f'{player}']['AM/PM'] = None
             player_attributes[f'{player}']['Message'] = None
             player_attributes[f'{player}']['Team'] = None
         player_id = player_attributes[f'{player}']['Player ID']
@@ -283,6 +355,15 @@ async def update(channel):
         invalidStats = False
         if player_attributes[f'{player}']['In Progress'] == True:
             for game in schedule:
+                if 'Start Time' in player_attributes[f'{player}']:
+                    print(f'Player: {player}\nStart Time: {player_attributes[f"{player}"]["Start Time"]}')
+                    if cur_ampm == 'AM' and player_attributes[f'{player}']['AM/PM'] == 'PM':
+                        break
+                    elif cur_ampm == player_attributes[f'{player}']['AM/PM']:
+                        if cur_ampm == 'PM' and cur_time == 0:
+                            cur_time += 1
+                        if int(player_attributes[f'{player}']['Start Time'][0]) > cur_time:
+                            break
                 if gameID:
                     player_stats = await get_stats(mlb, gameID, player, player_id, position)
                     if player_attributes[f'{player}']['Position'] == 'pitching':
@@ -329,13 +410,13 @@ async def update(channel):
                             player_attributes[f'{player}']['Message'] = await channel.send(summary)
                     break
 
-@tasks.loop(seconds=60)
+@tasks.loop(minutes=30)
 async def update_prices(channel):
     PriceTool = TheShowPrices()
     for player in players:
         uuid = player_uuids[f'{player}']
         alert_type = player_attributes[f'{player}']['Type']
-        data = await PriceTool.fetch(f'https://mlb23.theshow.com/apis/listing.json?uuid={uuid}')
+        data = await PriceTool.fetch(f'https://mlb24.theshow.com/apis/listing.json?uuid={uuid}')
         if alert_type == 'Buy':
             current_price = data['best_buy_price']
             desired_price = player_attributes[f'{player}']['Price']
@@ -362,6 +443,7 @@ async def on_ready():
     channel = bot.get_channel(1103827849007333447) # Channel to send updates in
     price_alerts = bot.get_channel(1106596697112596510) # Channel to send price updates in
     update.start(channel)
+    restart_loop.start(channel)
     update_prices.start(price_alerts)
 
 @bot.event

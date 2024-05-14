@@ -123,25 +123,25 @@ def get_stats(mlb, gameID, player, playerID, position):
         game = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]
         if game != None:
             player_attributes[f'{player}']['Game ID'] = gameID
-        summary = game.stats[position]['summary']
+        summary = game['summary']
     elif player_attributes[f'{player}']['Team'] == 'Away':
         game = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]
         if game != None:
             player_attributes[f'{player}']['Game ID'] = gameID
-        summary = game.stats[position]['summary']
+        summary = game['summary']
     else:
         try:
             game = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]
             if game != None:
                 player_attributes[f'{player}']['Game ID'] = gameID
-            summary = game.stats[position]['summary']
+            summary = game['summary']
             player_attributes[f'{player}']['Team'] = 'Home'
         except:
             try:
                 game = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]
                 if game != None:
                     player_attributes[f'{player}']['Game ID'] = gameID
-                summary = game.stats[position]['summary']
+                summary = game['summary']
                 player_attributes[f'{player}']['Team'] = 'Away'
             except Exception as e:
                 print(str(e)[0])
@@ -350,6 +350,7 @@ async def update(channel):
         if player_attributes[f'{player}']['In Progress'] == True:
             for game in schedule:
                 if 'Start Time' in player_attributes[f'{player}']:
+                    print(f'Player: {player}\nStart Time: {player_attributes[f'{player}']['Start Time']}')
                     if cur_ampm == 'AM' and player_attributes[f'{player}']['AM/PM'] == 'PM':
                         break
                     elif cur_ampm == player_attributes[f'{player}']['AM/PM']:
@@ -447,6 +448,6 @@ async def setup_hook():
     schedule = await get_schedule(mlb)
     PriceTool = TheShowPrices()
     await main(PriceTool)
-    await loadData()
+    #await loadData()
 
 bot.run(TOKEN)

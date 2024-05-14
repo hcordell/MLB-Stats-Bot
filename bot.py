@@ -271,6 +271,7 @@ async def shutdown(ctx, *args):
         player_attributes[f'{player}']['Game ID'] = None
         player_attributes[f'{player}']['In Progress'] = True
         player_attributes[f'{player}']['Start Time'] = None
+        player_attributes[f'{player}']['AM/PM'] = None
         player_attributes[f'{player}']['Message'] = None
         player_attributes[f'{player}']['Team'] = None
         if doc:

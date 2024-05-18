@@ -144,7 +144,6 @@ def get_stats(mlb, gameID, player, playerID, position):
                 summary = game['summary']
                 player_attributes[f'{player}']['Team'] = 'Away'
             except Exception as e:
-                print(str(e)[0])
                 if str(e)[1:3] != 'id':
                     player_attributes[f'{player}']['Game ID'] = gameID
                     player_attributes[f'{player}']['Start Time'] = mlb.get_game(gameID)['gamedata']['datetime']['time']
@@ -355,7 +354,7 @@ async def update(channel):
             for game in schedule:
                 if 'Start Time' in player_attributes[f'{player}']:
                     print(f'Player: {player}\nStart Time: {player_attributes[f"{player}"]["Start Time"]}')
-                    if cur_ampm == 'AM' and player_attributes[f'{player}']['AM/PM'] == 'PM':
+                    if cur_ampm == 'AM' and player_attributes[f'{player}']['AM/PM'] == 'PM' and not cur_time <= 2:
                         break
                     elif cur_ampm == player_attributes[f'{player}']['AM/PM']:
                         if cur_ampm == 'PM' and cur_time == 0:

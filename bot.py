@@ -308,6 +308,12 @@ async def restart_loop(channel):
     now = datetime.now()
     current_time = now.strftime("%H:%M")
     if current_time == '03:00':
+        player_attributes[f'{player}']['Game ID'] = None
+        player_attributes[f'{player}']['In Progress'] = True
+        player_attributes[f'{player}']['Start Time'] = '0:00'
+        player_attributes[f'{player}']['AM/PM'] = None
+        player_attributes[f'{player}']['Message'] = None
+        player_attributes[f'{player}']['Team'] = None
         player_db = client.players
         player_collection = player_db.players
         docs = []
@@ -334,27 +340,12 @@ async def restart_loop(channel):
 @tasks.loop(minutes=5)
 async def update(channel):
     print('Update in progress')
-    global current_date
     global schedule
-    date_changed = False
     cur_time = int(datetime.now().strftime('%H')) % 12
     cur_ampm = datetime.now().strftime('%p')
-    if current_date != date.today():
-        print('Sleeping...')
-        schedule = await get_schedule(mlb)
-        current_date = date.today()
-        date_changed = True
-        await asyncio.sleep(28800)
     for player in players:
         print(f'Updating {player}')
         await asyncio.sleep(30)
-        if date_changed:
-            player_attributes[f'{player}']['Game ID'] = None
-            player_attributes[f'{player}']['In Progress'] = True
-            player_attributes[f'{player}']['Start Time'] = '0:00'
-            player_attributes[f'{player}']['AM/PM'] = None
-            player_attributes[f'{player}']['Message'] = None
-            player_attributes[f'{player}']['Team'] = None
         player_id = player_attributes[f'{player}']['Player ID']
         position = player_attributes[f'{player}']['Position']
         gameID = player_attributes[f'{player}']['Game ID']
@@ -455,9 +446,7 @@ async def on_ready():
 
 @bot.event
 async def setup_hook():
-    global current_date
     global schedule
-    current_date = date.today()
     schedule = await get_schedule(mlb)
     PriceTool = TheShowPrices()
     await main(PriceTool)

@@ -123,18 +123,27 @@ def get_stats(mlb, gameID, player, playerID, position):
         game = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]
         if game != None:
             player_attributes[f'{player}']['Game ID'] = gameID
-        summary = game['summary']
+        try:
+            summary = game['summary']
+        except:
+            print('Summary not available.')
     elif player_attributes[f'{player}']['Team'] == 'Away':
         game = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]
         if game != None:
             player_attributes[f'{player}']['Game ID'] = gameID
-        summary = game['summary']
+        try:
+            summary = game['summary']
+        except:
+            print('Summary not available.')
     else:
         try:
             game = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]
             if game != None:
                 player_attributes[f'{player}']['Game ID'] = gameID
-            summary = game['summary']
+            try:
+                summary = game['summary']
+            except:
+                print('Summary not available.')
             player_attributes[f'{player}']['Team'] = 'Home'
         except:
             try:

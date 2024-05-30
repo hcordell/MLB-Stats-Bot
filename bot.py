@@ -120,23 +120,25 @@ def get_status(mlb, player, playerID, gameID):
 @unblock
 def get_stats(mlb, gameID, player, playerID, position):
     if player_attributes[f'{player}']['Team'] == 'Home':
-        game = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]
-        if game != None:
-            player_attributes[f'{player}']['Game ID'] = gameID
         try:
-            summary = game['summary']
+            game = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]
+            if game != None:
+                player_attributes[f'{player}']['Game ID'] = gameID
+                summary = game['summary']
         except:
-            print('Summary not available.')
+            player_attributes[f'{player}']['Team'] = None
+            print('Summary not available. Resetting team.')
             print(game)
             return None
     elif player_attributes[f'{player}']['Team'] == 'Away':
-        game = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]
-        if game != None:
-            player_attributes[f'{player}']['Game ID'] = gameID
         try:
-            summary = game['summary']
+            game = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]
+            if game != None:
+                player_attributes[f'{player}']['Game ID'] = gameID
+                summary = game['summary']
         except:
-            print('Summary not available.')
+            player_attributes[f'{player}']['Team'] = None
+            print('Summary not available. Resetting team.')
             print(game)
             return None
     else:
@@ -303,17 +305,11 @@ async def restart(ctx, *args):
     await ctx.send('Now Restarting...')
     await ctx.invoke(bot.get_command('shutdown'))
 
-@tasks.loop(minutes=1)
+@tasks.loop(hours=1)
 async def restart_loop(channel):
     now = datetime.now()
-    current_time = now.strftime("%H:%M")
-    if current_time == '03:00':
-        player_attributes[f'{player}']['Game ID'] = None
-        player_attributes[f'{player}']['In Progress'] = True
-        player_attributes[f'{player}']['Start Time'] = '0:00'
-        player_attributes[f'{player}']['AM/PM'] = None
-        player_attributes[f'{player}']['Message'] = None
-        player_attributes[f'{player}']['Team'] = None
+    current_time = now.strftime("%H")
+    if current_time == '03':
         player_db = client.players
         player_collection = player_db.players
         docs = []
@@ -321,6 +317,8 @@ async def restart_loop(channel):
             doc = await player_collection.find_one({'Name': player})
             player_attributes[f'{player}']['Game ID'] = None
             player_attributes[f'{player}']['In Progress'] = True
+            player_attributes[f'{player}']['Start Time'] = '0:00'
+            player_attributes[f'{player}']['AM/PM'] = None
             player_attributes[f'{player}']['Message'] = None
             player_attributes[f'{player}']['Team'] = None
             if doc:

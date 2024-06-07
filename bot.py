@@ -243,10 +243,14 @@ async def remove(ctx, *msg):
     if ctx.channel.id == 1109551093081448508: # Channel to send commands in
         player = capwords(' '.join(msg))
         if player in players:
+            if update.is_running():
+                update.cancel()
             players.remove(player)
             player_attributes.pop(player)
             await client.players.players.delete_one({'Name': f'{player}'})
             await ctx.send('Success: player removed')
+            channel = bot.get_channel(996715384365396038)
+            update.start(channel)
         else:
             await ctx.send('Error: player not found')
 

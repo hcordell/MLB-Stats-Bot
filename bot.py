@@ -402,7 +402,7 @@ async def prices(ctx, *args):
                 alert_type = player_attributes[f'{player}']['Type']
                 price = player_attributes[f'{player}']['Price']
                 price_list.append(f'[{alert_type}] {player}: {price}')
-        await user.send('\n'.join(price_list))
+            await user.send('\n'.join(price_list))
 
 @bot.command() # Bot command to display help information
 async def help_bot(ctx, *args):

@@ -1,7 +1,7 @@
 discord.py
 MLB-StatsAPI
 aiohttp
-certifiy
+certifi
 python-dotenv
 motor
 pymongo

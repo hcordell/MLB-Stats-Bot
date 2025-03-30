@@ -1,0 +1,241 @@
+2025-03-14 13:21:53,451 - INFO - logging in using static token
+2025-03-14 13:21:53,781 - INFO - Bot starting up, initializing data...
+2025-03-14 13:21:53,781 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success={}, status_code={}, message={}, url={}
+2025-03-14 13:21:53,875 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success=success, status_code=200, message=OK, url=https://statsapi.mlb.com/api/v1/schedule?date=2025-03-14&sportId=1
+2025-03-14 13:21:53,876 - INFO - Schedule loaded with 16 games
+2025-03-14 13:22:05,121 - INFO - Loaded 1818 player UUIDs
+2025-03-14 13:22:05,492 - INFO - Loaded 0 players from database
+2025-03-14 13:22:05,492 - INFO - Loaded 0 players from database
+2025-03-14 13:22:05,492 - INFO - Bot setup complete
+2025-03-14 13:22:05,830 - INFO - Shard ID None has connected to Gateway (Session ID: 53c3e2f4835e003c7754c04ac2e349a4).
+2025-03-14 13:22:07,860 - INFO - Bot connected as MLB Stats Bot
+2025-03-14 13:22:07,860 - INFO - All background tasks started
+2025-03-14 13:22:07,860 - INFO - Update in progress
+2025-03-14 13:22:07,860 - INFO - Refreshing schedule for 2025-03-14
+2025-03-14 13:22:07,860 - INFO - Starting price updates
+2025-03-14 13:22:07,860 - INFO - Price updates completed
+2025-03-14 13:22:07,860 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success={}, status_code={}, message={}, url={}
+2025-03-14 13:22:07,862 - INFO - Heartbeat: Bot is running
+2025-03-14 13:22:07,939 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success=success, status_code=200, message=OK, url=https://statsapi.mlb.com/api/v1/schedule?date=2025-03-14&sportId=1
+2025-03-14 13:22:07,942 - INFO - Schedule updated with 16 games
+2025-03-14 13:54:58,150 - INFO - logging in using static token
+2025-03-14 13:54:58,539 - INFO - Bot starting up, initializing data...
+2025-03-14 13:54:58,539 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success={}, status_code={}, message={}, url={}
+2025-03-14 13:54:58,672 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success=success, status_code=200, message=OK, url=https://statsapi.mlb.com/api/v1/schedule?date=2025-03-14&sportId=1
+2025-03-14 13:54:58,674 - INFO - Schedule loaded with 16 games
+2025-03-14 13:55:11,366 - INFO - Loaded 1818 player UUIDs
+2025-03-14 13:55:11,757 - INFO - Loaded 0 players from database
+2025-03-14 13:55:11,757 - INFO - Loaded 0 players from database
+2025-03-14 13:55:11,757 - INFO - Bot setup complete
+2025-03-14 13:55:12,142 - INFO - Shard ID None has connected to Gateway (Session ID: 053f38479b4d1b16a2a8d463fe737c94).
+2025-03-14 13:55:14,202 - INFO - Bot connected as MLB Stats Bot
+2025-03-14 13:55:14,202 - INFO - All background tasks started
+2025-03-14 13:55:14,202 - INFO - Update in progress
+2025-03-14 13:55:14,202 - INFO - Refreshing schedule for 2025-03-14
+2025-03-14 13:55:14,202 - INFO - Starting price updates
+2025-03-14 13:55:14,204 - INFO - Price updates completed
+2025-03-14 13:55:14,204 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success={}, status_code={}, message={}, url={}
+2025-03-14 13:55:14,204 - INFO - Heartbeat: Bot is running
+2025-03-14 13:55:14,279 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success=success, status_code=200, message=OK, url=https://statsapi.mlb.com/api/v1/schedule?date=2025-03-14&sportId=1
+2025-03-14 13:55:14,281 - INFO - Schedule updated with 16 games
+2025-03-14 13:55:50,501 - DEBUG - url=https://statsapi.mlb.com/api/v1/sports/1/players ,success={}, status_code={}, message={}, url={}
+2025-03-14 13:55:50,595 - DEBUG - url=https://statsapi.mlb.com/api/v1/sports/1/players ,success=success, status_code=200, message=OK, url=https://statsapi.mlb.com/api/v1/sports/1/players?fields=people%2Cid%2CfullName
+2025-03-14 13:55:50,599 - DEBUG - url=https://statsapi.mlb.com/api/v1/people/542303 ,success={}, status_code={}, message={}, url={}
+2025-03-14 13:55:50,675 - DEBUG - url=https://statsapi.mlb.com/api/v1/people/542303 ,success=success, status_code=200, message=OK, url=https://statsapi.mlb.com/api/v1/people/542303
+2025-03-14 13:55:50,939 - INFO - Update in progress
+2025-03-14 13:55:50,941 - INFO - Updating Marcell Ozuna
+2025-03-14 13:56:20,934 - DEBUG - url=https://statsapi.mlb.com/api/v1/game/778701/boxscore ,success={}, status_code={}, message={}, url={}
+2025-03-14 13:56:21,050 - DEBUG - url=https://statsapi.mlb.com/api/v1/game/778701/boxscore ,success=success, status_code=200, message=OK, url=https://statsapi.mlb.com/api/v1/game/778701/boxscore
+2025-03-14 13:56:21,073 - DEBUG - url=https://statsapi.mlb.com/api/v1.1/game/778701/feed/live ,success={}, status_code={}, message={}, url={}
+2025-03-14 13:56:21,163 - DEBUG - url=https://statsapi.mlb.com/api/v1.1/game/778701/feed/live ,success=success, status_code=200, message=OK, url=https://statsapi.mlb.com/api/v1.1/game/778701/feed/live
+2025-03-14 13:56:21,199 - ERROR - Error checking game status for Marcell Ozuna in game 778701: 'Game' object is not subscriptable
+2025-03-14 13:56:21,199 - DEBUG - url=https://statsapi.mlb.com/api/v1.1/game/778701/feed/live ,success={}, status_code={}, message={}, url={}
+2025-03-14 13:56:21,292 - DEBUG - url=https://statsapi.mlb.com/api/v1.1/game/778701/feed/live ,success=success, status_code=200, message=OK, url=https://statsapi.mlb.com/api/v1.1/game/778701/feed/live
+2025-03-14 13:56:21,326 - ERROR - Error checking if game 778701 is finished: 'Game' object is not subscriptable
+2025-03-14 13:56:21,525 - INFO - Successfully sent message for Marcell Ozuna
+2025-03-14 14:11:21,823 - INFO - logging in using static token
+2025-03-14 14:11:22,250 - INFO - Bot starting up, initializing data...
+2025-03-14 14:11:22,250 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success={}, status_code={}, message={}, url={}
+2025-03-14 14:11:22,342 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success=success, status_code=200, message=OK, url=https://statsapi.mlb.com/api/v1/schedule?date=2025-03-14&sportId=1
+2025-03-14 14:11:22,343 - INFO - Schedule loaded with 16 games
+2025-03-14 14:11:33,570 - INFO - Loaded 1818 player UUIDs
+2025-03-14 14:11:33,981 - INFO - Loaded 0 players from database
+2025-03-14 14:11:33,981 - INFO - Loaded 0 players from database
+2025-03-14 14:11:33,981 - INFO - Bot setup complete
+2025-03-14 14:11:34,181 - INFO - Shard ID None has connected to Gateway (Session ID: 5e76d646b3c72ae0ddd3a233ddd16fff).
+2025-03-14 14:11:36,289 - INFO - Bot connected as MLB Stats Bot
+2025-03-14 14:11:36,289 - INFO - All background tasks started
+2025-03-14 14:11:36,289 - INFO - Update in progress
+2025-03-14 14:11:36,289 - INFO - Refreshing schedule for 2025-03-14
+2025-03-14 14:11:36,289 - INFO - Starting price updates
+2025-03-14 14:11:36,291 - INFO - Price updates completed
+2025-03-14 14:11:36,291 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success={}, status_code={}, message={}, url={}
+2025-03-14 14:11:36,291 - INFO - Heartbeat: Bot is running
+2025-03-14 14:11:36,384 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success=success, status_code=200, message=OK, url=https://statsapi.mlb.com/api/v1/schedule?date=2025-03-14&sportId=1
+2025-03-14 14:11:36,386 - INFO - Schedule updated with 16 games
+2025-03-14 14:11:36,402 - ERROR - Ignoring exception in command prices
+Traceback (most recent call last):
+  File "C:\Users\natio\AppData\Roaming\Python\Python312\site-packages\discord\ext\commands\core.py", line 235, in wrapped
+    ret = await coro(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\natio\OneDrive\Desktop\MLB-Stats-Bot\bot.py", line 402, in prices
+    await user.send('\n'.join(price_list))
+  File "C:\Users\natio\AppData\Roaming\Python\Python312\site-packages\discord\abc.py", line 1644, in send
+    data = await state.http.send_message(channel.id, params=params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\natio\AppData\Roaming\Python\Python312\site-packages\discord\http.py", line 762, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 400 Bad Request (error code: 50006): Cannot send an empty message
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\natio\AppData\Roaming\Python\Python312\site-packages\discord\ext\commands\bot.py", line 1366, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\natio\AppData\Roaming\Python\Python312\site-packages\discord\ext\commands\core.py", line 1029, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\natio\AppData\Roaming\Python\Python312\site-packages\discord\ext\commands\core.py", line 244, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: HTTPException: 400 Bad Request (error code: 50006): Cannot send an empty message
+2025-03-25 18:35:05,722 - INFO - logging in using static token
+2025-03-25 18:35:06,046 - INFO - Bot starting up, initializing data...
+2025-03-25 18:35:06,046 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success={}, status_code={}, message={}, url={}
+2025-03-25 18:35:06,159 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success=success, status_code=200, message=OK, url=https://statsapi.mlb.com/api/v1/schedule?date=2025-03-25&sportId=1
+2025-03-25 18:35:06,159 - INFO - Schedule loaded with 10 games
+2025-03-25 18:35:18,418 - INFO - Loaded 1818 player UUIDs
+2025-03-25 18:35:18,892 - INFO - Loaded 0 players from database
+2025-03-25 18:35:18,892 - INFO - Loaded 0 players from database
+2025-03-25 18:35:18,892 - INFO - Bot setup complete
+2025-03-25 18:35:19,251 - INFO - Shard ID None has connected to Gateway (Session ID: 3d6db3ab15dfb3c782382394608c47e8).
+2025-03-25 18:35:21,415 - INFO - Bot connected as MLB Stats Bot
+2025-03-25 18:35:21,415 - INFO - All background tasks started
+2025-03-25 18:35:21,415 - INFO - Update in progress
+2025-03-25 18:35:21,415 - INFO - Refreshing schedule for 2025-03-25
+2025-03-25 18:35:21,415 - INFO - Starting price updates
+2025-03-25 18:35:21,415 - INFO - Price updates completed
+2025-03-25 18:35:21,416 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success={}, status_code={}, message={}, url={}
+2025-03-25 18:35:21,416 - INFO - Heartbeat: Bot is running
+2025-03-25 18:35:21,489 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success=success, status_code=200, message=OK, url=https://statsapi.mlb.com/api/v1/schedule?date=2025-03-25&sportId=1
+2025-03-25 18:35:21,490 - INFO - Schedule updated with 10 games
+2025-03-25 18:40:21,412 - INFO - Update in progress
+2025-03-25 18:45:21,413 - INFO - Update in progress
+2025-03-25 18:51:29,295 - INFO - logging in using static token
+2025-03-25 18:51:29,707 - INFO - Bot starting up, initializing data...
+2025-03-25 18:51:29,707 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success={}, status_code={}, message={}, url={}
+2025-03-25 18:51:29,790 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success=success, status_code=200, message=OK, url=https://statsapi.mlb.com/api/v1/schedule?date=2025-03-25&sportId=1
+2025-03-25 18:51:29,791 - INFO - Schedule loaded with 10 games
+2025-03-25 18:51:42,192 - INFO - Loaded 1818 player UUIDs
+2025-03-25 18:51:42,617 - INFO - Loaded 0 players from database
+2025-03-25 18:51:42,617 - INFO - Loaded 0 players from database
+2025-03-25 18:51:42,617 - INFO - Bot setup complete
+2025-03-25 18:51:42,829 - INFO - Shard ID None has connected to Gateway (Session ID: e07cc5057240ea8b3e4070a460f9eb9f).
+2025-03-25 18:51:44,868 - INFO - Bot connected as MLB Stats Bot
+2025-03-25 18:51:44,868 - INFO - All background tasks started
+2025-03-25 18:51:44,868 - INFO - Update in progress
+2025-03-25 18:51:44,868 - INFO - Refreshing schedule for 2025-03-25
+2025-03-25 18:51:44,868 - INFO - Starting price updates
+2025-03-25 18:51:44,868 - INFO - Price updates completed
+2025-03-25 18:51:44,870 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success={}, status_code={}, message={}, url={}
+2025-03-25 18:51:44,870 - INFO - Heartbeat: Bot is running
+2025-03-25 18:51:44,946 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success=success, status_code=200, message=OK, url=https://statsapi.mlb.com/api/v1/schedule?date=2025-03-25&sportId=1
+2025-03-25 18:51:44,947 - INFO - Schedule updated with 10 games
+2025-03-25 18:56:44,868 - INFO - Update in progress
+2025-03-25 19:01:44,870 - INFO - Update in progress
+2025-03-29 09:17:52,147 - INFO - logging in using static token
+2025-03-29 09:17:52,511 - INFO - Bot starting up, initializing data...
+2025-03-29 09:17:52,512 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success={}, status_code={}, message={}, url={}
+2025-03-29 09:17:52,587 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success=success, status_code=200, message=OK, url=https://statsapi.mlb.com/api/v1/schedule?date=2025-03-29&sportId=1
+2025-03-29 09:17:52,590 - INFO - Schedule loaded with 15 games
+2025-03-29 09:18:03,992 - INFO - Loaded 1818 player UUIDs
+2025-03-29 09:18:04,448 - INFO - Loaded 0 players from database
+2025-03-29 09:18:04,448 - INFO - Loaded 0 players from database
+2025-03-29 09:18:04,449 - INFO - Bot setup complete
+2025-03-29 09:18:04,639 - INFO - Shard ID None has connected to Gateway (Session ID: 059aef824f910f331f0376e5dd36d4cf).
+2025-03-29 09:18:06,743 - INFO - Bot connected as MLB Stats Bot
+2025-03-29 09:18:06,743 - INFO - All background tasks started
+2025-03-29 09:18:06,743 - INFO - Update in progress
+2025-03-29 09:18:06,743 - INFO - Refreshing schedule for 2025-03-29
+2025-03-29 09:18:06,744 - INFO - Starting price updates
+2025-03-29 09:18:06,744 - INFO - Price updates completed
+2025-03-29 09:18:06,744 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success={}, status_code={}, message={}, url={}
+2025-03-29 09:18:06,744 - INFO - Heartbeat: Bot is running
+2025-03-29 09:18:06,816 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success=success, status_code=200, message=OK, url=https://statsapi.mlb.com/api/v1/schedule?date=2025-03-29&sportId=1
+2025-03-29 09:18:06,817 - INFO - Schedule updated with 15 games
+2025-03-29 09:23:06,750 - INFO - Update in progress
+2025-03-29 09:24:02,683 - ERROR - Ignoring exception in command status
+Traceback (most recent call last):
+  File "C:\Users\natio\AppData\Roaming\Python\Python312\site-packages\discord\ext\commands\bot.py", line 1366, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\natio\AppData\Roaming\Python\Python312\site-packages\discord\ext\commands\core.py", line 1021, in invoke
+    await self.prepare(ctx)
+  File "C:\Users\natio\AppData\Roaming\Python\Python312\site-packages\discord\ext\commands\core.py", line 925, in prepare
+    if not await self.can_run(ctx):
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\natio\AppData\Roaming\Python\Python312\site-packages\discord\ext\commands\core.py", line 1288, in can_run
+    return await discord.utils.async_all(predicate(ctx) for predicate in predicates)  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\natio\AppData\Roaming\Python\Python312\site-packages\discord\utils.py", line 725, in async_all
+    for elem in gen:
+                ^^^
+  File "C:\Users\natio\AppData\Roaming\Python\Python312\site-packages\discord\ext\commands\core.py", line 1288, in <genexpr>
+    return await discord.utils.async_all(predicate(ctx) for predicate in predicates)  # type: ignore
+                                         ^^^^^^^^^^^^^^
+  File "C:\Users\natio\AppData\Roaming\Python\Python312\site-packages\discord\ext\commands\core.py", line 2043, in predicate
+    raise NoPrivateMessage()
+discord.ext.commands.errors.NoPrivateMessage: This command cannot be used in private messages.
+2025-03-29 09:28:06,744 - INFO - Update in progress
+2025-03-29 09:33:06,732 - INFO - Update in progress
+2025-03-29 09:33:06,732 - INFO - Heartbeat: Bot is running
+2025-03-29 09:38:06,756 - INFO - Update in progress
+2025-03-29 09:43:06,746 - INFO - Update in progress
+2025-03-29 09:48:06,733 - INFO - Update in progress
+2025-03-29 09:48:06,733 - INFO - Starting price updates
+2025-03-29 09:48:06,733 - INFO - Price updates completed
+2025-03-29 09:48:06,733 - INFO - Heartbeat: Bot is running
+2025-03-29 09:53:06,747 - INFO - Update in progress
+2025-03-29 09:58:06,751 - INFO - Update in progress
+2025-03-29 10:03:06,751 - INFO - Update in progress
+2025-03-29 10:03:06,751 - INFO - Heartbeat: Bot is running
+2025-03-29 10:08:06,748 - INFO - Update in progress
+2025-03-29 10:13:06,743 - INFO - Update in progress
+2025-03-29 10:18:06,737 - INFO - Update in progress
+2025-03-29 10:18:06,738 - INFO - Heartbeat: Bot is running
+2025-03-29 10:18:06,738 - INFO - Starting price updates
+2025-03-29 10:18:06,738 - INFO - Price updates completed
+2025-03-29 10:23:06,743 - INFO - Update in progress
+2025-03-29 10:28:06,731 - INFO - Update in progress
+2025-03-29 10:33:06,740 - INFO - Heartbeat: Bot is running
+2025-03-29 10:33:06,740 - INFO - Update in progress
+2025-03-29 10:38:06,735 - INFO - Update in progress
+2025-03-29 10:43:06,732 - INFO - Update in progress
+2025-03-29 10:48:02,750 - INFO - Shard ID None has successfully RESUMED session 059aef824f910f331f0376e5dd36d4cf.
+2025-03-29 10:48:06,738 - INFO - Heartbeat: Bot is running
+2025-03-29 10:48:06,738 - INFO - Starting price updates
+2025-03-29 10:48:06,738 - INFO - Price updates completed
+2025-03-29 10:48:06,738 - INFO - Update in progress
+2025-03-29 10:53:06,742 - INFO - Update in progress
+2025-03-29 10:58:06,744 - INFO - Update in progress
+2025-03-29 11:03:06,731 - INFO - Update in progress
+2025-03-29 11:03:06,752 - INFO - Heartbeat: Bot is running
+2025-03-29 11:08:06,735 - INFO - Update in progress
+2025-03-29 11:13:06,735 - INFO - Update in progress
+2025-03-29 11:18:06,735 - INFO - Starting price updates
+2025-03-29 11:18:06,735 - INFO - Price updates completed
+2025-03-29 11:18:06,735 - INFO - Heartbeat: Bot is running
+2025-03-29 11:18:06,735 - INFO - Update in progress
+2025-03-29 11:23:06,741 - INFO - Update in progress
+2025-03-29 11:28:06,742 - INFO - Update in progress
+2025-03-29 11:33:06,745 - INFO - Update in progress
+2025-03-29 11:33:06,745 - INFO - Heartbeat: Bot is running
+2025-03-29 11:38:06,744 - INFO - Update in progress
+2025-03-29 11:43:06,735 - INFO - Update in progress
+2025-03-29 11:48:06,735 - INFO - Heartbeat: Bot is running
+2025-03-29 11:48:06,735 - INFO - Starting price updates
+2025-03-29 11:48:06,735 - INFO - Price updates completed
+2025-03-29 11:48:06,735 - INFO - Update in progress
+2025-03-29 11:53:06,733 - INFO - Update in progress
+2025-03-29 11:58:06,746 - INFO - Update in progress
+2025-03-29 12:03:06,741 - INFO - Update in progress
+2025-03-29 12:03:06,742 - INFO - Heartbeat: Bot is running
+2025-03-29 12:08:06,748 - INFO - Update in progress

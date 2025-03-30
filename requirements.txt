@@ -1,5 +1,5 @@
 discord.py
-MLB-StatsAPI
+python-mlb-statsapi
 aiohttp
 certifi
 python-dotenv

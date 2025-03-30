@@ -239,3 +239,8 @@ discord.ext.commands.errors.NoPrivateMessage: This command cannot be used in pri
 2025-03-29 12:03:06,741 - INFO - Update in progress
 2025-03-29 12:03:06,742 - INFO - Heartbeat: Bot is running
 2025-03-29 12:08:06,748 - INFO - Update in progress
+2025-03-30 13:19:53,967 - INFO - logging in using static token
+2025-03-30 13:19:54,531 - INFO - Bot starting up, initializing data...
+2025-03-30 13:19:54,531 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success={}, status_code={}, message={}, url={}
+2025-03-30 13:19:54,612 - DEBUG - url=https://statsapi.mlb.com/api/v1/schedule ,success=success, status_code=200, message=OK, url=https://statsapi.mlb.com/api/v1/schedule?date=2025-03-30&sportId=1
+2025-03-30 13:19:54,612 - INFO - Schedule loaded with 13 games

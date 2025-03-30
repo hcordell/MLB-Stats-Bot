@@ -96,7 +96,7 @@ async def main(PriceTool):
     try:
         for x in range(1, 74):
             try:
-                data = await PriceTool.fetch(f'https://mlb24.theshow.com/apis/listings.json?type=mlb_card&page={x}&series_id=1337')
+                data = await PriceTool.fetch(f'https://mlb25.theshow.com/apis/listings.json?type=mlb_card&page={x}&series_id=1337')
                 if not data:
                     logger.error(f"Failed to fetch data for page {x}")
                     continue
@@ -382,7 +382,7 @@ async def remove(ctx, *msg):
 
 @bot.command() # Bot command to print player list
 async def list(ctx, *args):
-    if ctx.channel.id == 1109551093081448508: # Channel to send commands in
+    if ctx.channel.id == 1109551093081448508 or isinstance(ctx.channel, discord.channel.DMChannel): # Channel to send commands in
         if len(players) == 0:
             await ctx.send('Error: list is empty')
         else:
@@ -395,10 +395,13 @@ async def prices(ctx, *args):
         user_id = ctx.author.id
         user = await bot.fetch_user(user_id)
         price_list = []
-        for player in players:
-            alert_type = player_attributes[f'{player}']['Type']
-            price = player_attributes[f'{player}']['Price']
-            price_list.append(f'[{alert_type}] {player}: {price}')
+        if len(players) == 0:
+            await ctx.send('Error: list is empty')
+        else:
+            for player in players:
+                alert_type = player_attributes[f'{player}']['Type']
+                price = player_attributes[f'{player}']['Price']
+                price_list.append(f'[{alert_type}] {player}: {price}')
         await user.send('\n'.join(price_list))
 
 @bot.command() # Bot command to display help information
@@ -415,28 +418,9 @@ async def help_bot(ctx, *args):
             "!status - Check bot status",
             "!refresh - Refresh schedule and player data",
             "!help_bot - Show this help message",
-            "```",
-            "For support or bug reports, contact the bot administrator."
+            "```"
         ]
         await ctx.send("\n".join(help_message))
-
-@bot.command() # Bot command to report a bug
-async def report_bug(ctx, *args):
-    if ctx.channel.id == 1109551093081448508 or isinstance(ctx.channel, discord.channel.DMChannel):
-        if not args:
-            await ctx.send("Please provide a description of the bug. Usage: `!report_bug [description]`")
-            return
-            
-        bug_description = " ".join(args)
-        admin_channel = bot.get_channel(996715384365396038)  # Admin channel for bug reports
-        
-        try:
-            await admin_channel.send(f"**Bug Report from {ctx.author}**\n{bug_description}")
-            await ctx.send("Bug report submitted successfully. Thank you for helping improve the bot!")
-            logger.info(f"Bug report from {ctx.author}: {bug_description}")
-        except Exception as e:
-            logger.error(f"Error submitting bug report: {str(e)}")
-            await ctx.send("There was an error submitting your bug report. Please try again later.")
 
 @bot.command() # Bot command to shutdown and save
 @commands.has_role('Admins')
@@ -476,7 +460,7 @@ async def restart(ctx, *args):
 @commands.has_role('Admins')
 async def status(ctx, *args):
     try:
-        if ctx.channel.id == 1109551093081448508 or ctx.channel.id == 1103511198474960916:
+        if ctx.channel.id == 1109551093081448508 or ctx.channel.id == 1103511198474960916 or isinstance(ctx.channel, discord.channel.DMChannel):
             status_message = []
             status_message.append("**Bot Status Report**")
             
@@ -766,7 +750,7 @@ async def update_prices(channel):
                 uuid = player_uuids[f'{player}']
                 alert_type = player_attributes[f'{player}']['Type']
                 
-                data = await PriceTool.fetch(f'https://mlb24.theshow.com/apis/listing.json?uuid={uuid}')
+                data = await PriceTool.fetch(f'https://mlb25.theshow.com/apis/listing.json?uuid={uuid}')
                 if not data:
                     logger.error(f"Failed to fetch price data for {player}")
                     continue

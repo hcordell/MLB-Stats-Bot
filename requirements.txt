@@ -1,0 +1,7 @@
+discord.py
+MLB-StatsAPI
+aiohttp
+certifiy
+python-dotenv
+motor
+pymongo

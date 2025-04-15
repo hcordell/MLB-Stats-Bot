@@ -694,12 +694,7 @@ async def update(channel):
                             invalidStats = True
                         
                         # Construct summary message
-                        if status and position == 'pitching':
-                            summary = f'{player}: {player_stats} (Currently {position.capitalize()})'
-                        elif position == 'pitching':
-                            summary = f'{player}: {player_stats} (Not {position.capitalize()})'
-                        else:
-                            summary = f'{player}: {player_stats}'
+                        summary = f'{player}: {player_stats}'
                         
                         # Check game status with retry
                         gameOver = None

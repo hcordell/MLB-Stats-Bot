@@ -344,6 +344,12 @@ async def buy(ctx, *name):
                 await ctx.send('Success: player found')
                 channel = bot.get_channel(996715384365396038)
                 update.start(channel)
+
+                # Add player to database
+                await client.players.players.insert_one({
+                    'Name': player,
+                    'Attributes': player_attributes[f'{player}']
+                })
             else:
                 await ctx.send('Error: player not found')
         else:

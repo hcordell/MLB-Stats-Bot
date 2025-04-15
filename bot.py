@@ -524,6 +524,33 @@ async def refresh(ctx, *args):
         logger.error(f"Error in refresh command: {str(e)}")
         await ctx.send(f"Error during refresh: {str(e)}")
 
+@tasks.loop(hours=1)
+async def db_backup():
+    try:
+        player_db = client.players
+        player_collection = player_db.players
+        docs = []
+        
+        for player in players:
+            try:
+                doc = await player_collection.find_one({'Name': player})
+                if doc:
+                    updates = {'$set': {'Attributes': player_attributes[f'{player}']}}
+                    await player_collection.update_one({'Name': player}, updates)
+                else:
+                    doc = {
+                        'Name': player,
+                        'Attributes': player_attributes[f'{player}']
+                    }
+                    docs.append(doc)
+            except Exception as e:
+                logger.error(f"Error backing up player {player}: {str(e)}")
+        
+        if len(docs) != 0:
+            await player_collection.insert_many(docs)
+    except Exception as e:
+        logger.error(f"Error in db_backup: {str(e)}")
+
 @tasks.loop(minutes=1)
 async def restart_loop(channel):
     try:
@@ -850,6 +877,9 @@ async def on_ready():
         
         if not heartbeat.is_running():
             heartbeat.start()
+        
+        if not db_backup.is_running():
+            db_backup.start()
             
         logger.info("All background tasks started")
     except Exception as e:

@@ -30,7 +30,7 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 PASSWORD = os.getenv('PASSWORD')
 
-uri = f"mongodb+srv://Chimaezss:{PASSWORD}@mlbstatsbotdb.wcpwbzb.mongodb.net/?retryWrites=true&w=majority&tls=true"
+uri = f"mongodb+srv://Chimaezss:{PASSWORD}@mlbstatsbotdb.wcpwbzb.mongodb.net/?retryWrites=true&w=majority&appName=MLBStatsBotDB"
 client = AsyncIOMotorClient(uri, server_api=ServerApi('1'), tlsCAFile=certifi.where())
 
 intents = discord.Intents.default() # Set parameters for discord bot
@@ -151,7 +151,7 @@ def get_schedule(mlb):
 @unblock
 def get_game_finish(mlb, gameID):
     try:
-        status = mlb.get_game(gameID)['metadata']['gameevents']
+        status = mlb.get_game(gameID).metadata.gameevents
         if 'game_finished' in status:
             return True
         return False

@@ -1,15 +1,22 @@
+import requests
 import mlbstatsapi
+import json
+from datetime import date
+mlb = mlbstatsapi.Mlb()
 
-def get_game_finish(mlb):
+url = 'https://statsapi.mlb.com/api/v1.1/game/778147/feed/live'
+response = requests.get(url)
+data = response.json()
+
+data2 = mlb.get_game(778147)
+schedule = mlb.get_scheduled_games_by_date('2025-04-26')
+print(data2)
+
+for id in data['liveData']['boxscore']['teams']['away']['players']:
     try:
-        gameID = 778268
-        status = mlb.get_game(gameID).metadata.gameevents
-        if 'game_finished' in status:
-            print('Game finished')
-        print(status)
-    except Exception as e:
-        print(e)
+        print(data['liveData']['boxscore']['teams']['away']['players'][id]['person']['fullName'])
+        print(data['liveData']['boxscore']['teams']['away']['players'][id]['stats']['batting']['summary'])
+    except:
+        print('No batting stats')
 
-mlb = mlbstatsapi.Mlb() # Initalize MLB API
 
-get_game_finish(mlb)

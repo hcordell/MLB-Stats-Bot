@@ -8,6 +8,7 @@ import aiohttp
 import typing
 import certifi
 import logging
+import sys
 from datetime import datetime, date
 from dotenv import load_dotenv
 from string import capwords
@@ -17,6 +18,7 @@ from pymongo.server_api import ServerApi
 
 # Configure logging
 logging.basicConfig(
+    stream=sys.stdout,
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
@@ -81,6 +83,12 @@ async def loadData():
                 try:
                     players.add(player['Name'])
                     player_attributes[f'{player["Name"]}'] = player['Attributes']
+                    player_attributes[f'{player}']['Game ID'] = None
+                    player_attributes[f'{player}']['In Progress'] = True
+                    player_attributes[f'{player}']['Start Time'] = None
+                    player_attributes[f'{player}']['AM/PM'] = None
+                    player_attributes[f'{player}']['Message'] = None
+                    player_attributes[f'{player}']['Team'] = None
                 except KeyError as e:
                     logger.error(f"Missing key in player data: {str(e)}")
                 except Exception as e:

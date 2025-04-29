@@ -79,12 +79,12 @@ async def loadData():
                 try:
                     players.add(player['Name'])
                     player_attributes[f'{player["Name"]}'] = player['Attributes']
-                    player_attributes[f'{player}']['Game ID'] = None
-                    player_attributes[f'{player}']['In Progress'] = True
-                    player_attributes[f'{player}']['Start Time'] = None
-                    player_attributes[f'{player}']['AM/PM'] = None
-                    player_attributes[f'{player}']['Message'] = None
-                    player_attributes[f'{player}']['Team'] = None
+                    player_attributes[f'{player["Name"]}']['Game ID'] = None
+                    player_attributes[f'{player["Name"]}']['In Progress'] = True
+                    player_attributes[f'{player["Name"]}']['Start Time'] = None
+                    player_attributes[f'{player["Name"]}']['AM/PM'] = None
+                    player_attributes[f'{player["Name"]}']['Message'] = None
+                    player_attributes[f'{player["Name"]}']['Team'] = None
                 except KeyError as e:
                     logger.error(f"Missing key in player data: {str(e)}")
                 except Exception as e:
@@ -460,12 +460,6 @@ async def shutdown(ctx, *args):
     await ctx.send('Shutting Down...')
     await bot.close()
 
-@bot.command() # Bot command to restart
-async def restart(ctx, *args):
-    os.startfile('bot.py')
-    await ctx.send('Now Restarting...')
-    await ctx.invoke(bot.get_command('shutdown'))
-
 @bot.command() # Bot command to check bot status
 @commands.has_role('Admins')
 async def status(ctx, *args):
@@ -477,7 +471,6 @@ async def status(ctx, *args):
             # Check tasks
             status_message.append(f"Update task running: {update.is_running()}")
             status_message.append(f"Update prices task running: {update_prices.is_running()}")
-            status_message.append(f"Restart loop task running: {restart_loop.is_running()}")
             status_message.append(f"Heartbeat task running: {heartbeat.is_running()}")
             
             # Check data
@@ -560,54 +553,6 @@ async def db_backup():
             await player_collection.insert_many(docs)
     except Exception as e:
         logger.error(f"Error in db_backup: {str(e)}")
-
-@tasks.loop(minutes=1)
-async def restart_loop(channel):
-    try:
-        now = datetime.now()
-        current_time = now.strftime("%H:%M")
-        if current_time == '03:00':
-            logger.info("Daily restart triggered")
-            try:
-                player_db = client.players
-                player_collection = player_db.players
-                docs = []
-                
-                for player in players:
-                    try:
-                        doc = await player_collection.find_one({'Name': player})
-                        player_attributes[f'{player}']['Game ID'] = None
-                        player_attributes[f'{player}']['In Progress'] = True
-                        player_attributes[f'{player}']['Start Time'] = '0:00'
-                        player_attributes[f'{player}']['AM/PM'] = None
-                        player_attributes[f'{player}']['Message'] = None
-                        player_attributes[f'{player}']['Team'] = None
-                        
-                        if doc:
-                            updates = {'$set': {'Attributes': player_attributes[f'{player}']}}
-                            await player_collection.update_one({'Name': player}, updates)
-                        else:
-                            doc = {
-                                'Name': player,
-                                'Attributes': player_attributes[f'{player}']
-                            }
-                            docs.append(doc)
-                    except Exception as e:
-                        logger.error(f"Error updating player {player} in database during restart: {str(e)}")
-                
-                if len(docs) != 0:
-                    try:
-                        await player_collection.insert_many(docs)
-                    except Exception as e:
-                        logger.error(f"Error inserting new players during restart: {str(e)}")
-                
-                logger.info("Database updated, starting new bot instance")
-                os.startfile('bot.py')
-                await bot.close()
-            except Exception as e:
-                logger.error(f"Error during restart process: {str(e)}")
-    except Exception as e:
-        logger.error(f"Unexpected error in restart_loop: {str(e)}")
 
 @tasks.loop(minutes=5)
 async def update(channel):
@@ -855,10 +800,6 @@ async def heartbeat():
             price_alerts = bot.get_channel(1107027549382516766)
             update_prices.start(price_alerts)
         
-        if not restart_loop.is_running():
-            logger.warning("Restart_loop task is not running, restarting it")
-            channel = bot.get_channel(996715384365396038)
-            restart_loop.start(channel)
     except Exception as e:
         logger.error(f"Error in heartbeat: {str(e)}")
 
@@ -873,9 +814,6 @@ async def on_ready():
         # Start all background tasks
         if not update.is_running():
             update.start(channel)
-        
-        if not restart_loop.is_running():
-            restart_loop.start(channel)
         
         if not update_prices.is_running():
             update_prices.start(price_alerts)

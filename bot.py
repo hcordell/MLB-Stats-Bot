@@ -98,9 +98,9 @@ async def loadData():
 
 async def main(PriceTool):
     try:
-        for x in range(1, 74):
+        for x in range(1, 63):
             try:
-                data = await PriceTool.fetch(f'https://mlb25.theshow.com/apis/listings.json?type=mlb_card&page={x}&series_id=1337')
+                data = await PriceTool.fetch(f'https://mlb26.theshow.com/apis/listings.json?type=mlb_card&page={x}&series_id=1337')
                 if not data:
                     logger.error(f"Failed to fetch data for page {x}")
                     continue
@@ -727,7 +727,7 @@ async def update_prices(channel):
                 uuid = player_uuids[f'{player}']
                 alert_type = player_attributes[f'{player}']['Type']
                 
-                data = await PriceTool.fetch(f'https://mlb25.theshow.com/apis/listing.json?uuid={uuid}')
+                data = await PriceTool.fetch(f'https://mlb26.theshow.com/apis/listing.json?uuid={uuid}')
                 if not data:
                     logger.error(f"Failed to fetch price data for {player}")
                     continue

@@ -15,6 +15,7 @@ from string import capwords
 from discord.ext import commands, tasks
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.server_api import ServerApi
+import requests
 
 # Configure logging
 logging.basicConfig(
@@ -140,7 +141,7 @@ def get_player(mlb, player_name):
 
 @unblock
 def get_position(mlb, player, player_attributes):
-    player_position = mlb.get_person(player_attributes[f'{player}']['Player ID']).primaryposition.name
+    player_position = mlb.get_person(player_attributes[f'{player}']['Player ID']).primary_position.name
     return player_position
 
 @unblock
@@ -155,8 +156,8 @@ def get_schedule(mlb):
 @unblock
 def get_game_finish(mlb, gameID):
     try:
-        status = mlb.get_game(gameID).metadata.gameevents
-        if 'game_finished' in status:
+        status = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{gameID}/feed/live").json()
+        if 'game_finished' in status['metaData']['gameEvents']:
             return True
         return False
     except Exception as e:
@@ -242,7 +243,7 @@ def get_stats(mlb, gameID, player, playerID, position):
         else:
             try:
                 # Try home team first
-                game = mlb.get_game_box_score(gameID).teams.home.players[f"id{playerID}"].stats[position]
+                game = mlb.get_game_box_score(gameID).teams.home.players[f"ID{playerID}"].stats[position]
                 if game != None:
                     player_attributes[f'{player}']['Game ID'] = gameID
                 summary = game['summary']
@@ -250,7 +251,7 @@ def get_stats(mlb, gameID, player, playerID, position):
             except Exception as home_e:
                 try:
                     # Try away team if home team fails
-                    game = mlb.get_game_box_score(gameID).teams.away.players[f"id{playerID}"].stats[position]
+                    game = mlb.get_game_box_score(gameID).teams.away.players[f"ID{playerID}"].stats[position]
                     if game != None:
                         player_attributes[f'{player}']['Game ID'] = gameID
                     summary = game['summary']
@@ -260,7 +261,7 @@ def get_stats(mlb, gameID, player, playerID, position):
                         # If player not found in either team but ID exists, store game time info
                         if str(e)[1:3] != 'id':
                             player_attributes[f'{player}']['Game ID'] = gameID
-                            game_data = mlb.get_game(gameID)['gamedata']['datetime']
+                            game_data = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{gameID}/feed/live").json()['gameData']['datetime']
                             player_attributes[f'{player}']['Start Time'] = game_data['time']
                             player_attributes[f'{player}']['AM/PM'] = game_data['ampm']
                     except Exception as time_e:
@@ -278,8 +279,8 @@ def get_stats(mlb, gameID, player, playerID, position):
             player_attributes[f'{player}']['Game ID'] = gameID
             try:
                 # Check if game is finished
-                status = mlb.get_game(gameID)['metadata']['gameevents']
-                if 'game_finished' in status:
+                status = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{gameID}/feed/live").json()
+                if 'game_finished' in status['metaData']['gameEvents']:
                     finished = True
                 else:
                     finished = False
@@ -376,7 +377,7 @@ async def sell(ctx, *msg):
 @bot.command() # Bot command to remove player
 @commands.has_role('Admins')
 async def remove(ctx, *msg):
-    if ctx.channel.id == 1109551093081448508: # Channel to send commands in
+    if ctx.channel.id == 1109551093081448508 or ctx.channel.id == 1103511198474960916: # Channel to send commands in
         player = capwords(' '.join(msg))
         if player in players:
             if update.is_running():
@@ -610,7 +611,7 @@ async def update(channel):
                                 if gameID:
                                     player_stats = await get_stats(mlb, gameID, player, player_id, position)
                                 else:
-                                    player_stats = await get_stats(mlb, game.gamepk, player, player_id, position)
+                                    player_stats = await get_stats(mlb, game.game_pk, player, player_id, position)
                                 break
                             except Exception as e:
                                 logger.warning(f"Stats fetch attempt {attempt + 1} failed for {player}: {str(e)}")
@@ -624,7 +625,7 @@ async def update(channel):
                             status = None
                             for attempt in range(3):  # Try up to 3 times
                                 try:
-                                    status = await get_status(mlb, player, player_id, game.gamepk)
+                                    status = await get_status(mlb, player, player_id, game.game_pk)
                                     break
                                 except Exception as e:
                                     logger.warning(f"Status fetch attempt {attempt + 1} failed for {player}: {str(e)}")
@@ -652,7 +653,7 @@ async def update(channel):
                                 if gameID:
                                     gameOver = await get_game_finish(mlb, gameID)
                                 else:
-                                    gameOver = await get_game_finish(mlb, game.gamepk)
+                                    gameOver = await get_game_finish(mlb, game.game_pk)
                                 break
                             except Exception as e:
                                 logger.warning(f"Game finish check attempt {attempt + 1} failed for {player}: {str(e)}")

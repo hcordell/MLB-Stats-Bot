@@ -1,7 +1,7 @@
 discord.py == 2.5.2
 python-mlb-statsapi == 0.5.25
 aiohttp == 3.11.13
-certifi
+certifi == 2024.12.14
 python-dotenv == 1.0.1
 motor == 3.7.0
 pymongo == 4.9.1

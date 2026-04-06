@@ -133,7 +133,7 @@ def unblock(func: typing.Callable) -> typing.Coroutine:
 @unblock
 def get_player(mlb, player_name):
     try:
-        player = mlb.get_people_id(player_name)
+        player = mlb.get_people_id(player_name)[0]
     except:
         return None
     return player
